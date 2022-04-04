@@ -27,12 +27,12 @@ func (gtp *GTP) CalcInitialHash(clientIP string, tourLength int, secret string) 
 	return sha1.Sum([]byte(clientIP + strconv.Itoa(tourLength) + gtp.timestamp() + secret))
 }
 
-func (gtp *GTP) CalcGuideHash(prevHash Hash, tourNumber int, tourLength int, clientIP string, secret string) Hash {
+func (gtp *GTP) CalcGuideHash(prevHash Hash, tourNumber, tourLength int, clientIP, secret string) Hash {
 	//nolint:gosec
 	return sha1.Sum([]byte(string(prevHash[:]) + strconv.Itoa(tourNumber) + strconv.Itoa(tourLength) + clientIP + gtp.timestamp() + secret))
 }
 
-func (gtp *GTP) VerifyHash(initialHash, lastHash Hash, tourLength int, clientIP string, secret string, guideSecrets []string) bool {
+func (gtp *GTP) VerifyHash(initialHash, lastHash Hash, tourLength int, clientIP, secret string, guideSecrets []string) bool {
 	if initialHash != gtp.CalcInitialHash(clientIP, tourLength, secret) {
 		return false
 	}
@@ -41,9 +41,11 @@ func (gtp *GTP) VerifyHash(initialHash, lastHash Hash, tourLength int, clientIP 
 	for i := 1; i < tourLength+1; i++ {
 		hash = gtp.CalcGuideHash(hash, i, tourLength, clientIP, guideSecrets[GuideIndex(hash, len(guideSecrets))])
 	}
+
 	return hash == lastHash
 }
 
+//nolint:wsl
 func GuideIndex(hash Hash, guideCount int) int64 {
 	hashNumber := big.NewInt(0)
 	hashNumber.SetBytes(hash[:])

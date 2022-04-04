@@ -18,13 +18,14 @@ func main() {
 	if conf.Debug {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
+
 	logrus.Debugf("%+v", conf)
 
 	srv := server.NewServer(
 		conf.Host,
 		conf.Port,
 		conf.SecretLength,
-		time.Duration(conf.SecretUpdateIntervalSeconds),
+		conf.SecretUpdateInterval,
 		conf.TourLength,
 		conf.GuideSecrets,
 		gtp.NewGTP(time.Now),

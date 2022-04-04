@@ -13,14 +13,14 @@ import (
 )
 
 type Server struct {
-	host                        string
-	port                        string
-	secretLength                int
-	secretUpdateIntervalSeconds time.Duration
-	secret                      string
-	tourLength                  int
-	guideSecrets                []string
-	hashCalc                    HashCalc
+	host                 string
+	port                 string
+	secretLength         int
+	secretUpdateInterval time.Duration
+	secret               string
+	tourLength           int
+	guideSecrets         []string
+	hashCalc             HashCalc
 
 	rand *rand.Rand
 }
@@ -29,20 +29,20 @@ func NewServer(
 	host string,
 	port string,
 	secretLength int,
-	secretUpdateIntervalSeconds time.Duration,
+	secretUpdateInterval time.Duration,
 	tourLength int,
 	guideSecrets []string,
 	hashCalc HashCalc,
 	rand *rand.Rand,
 ) *Server {
 	return &Server{
-		host:                        host,
-		port:                        port,
-		secretLength:                secretLength,
-		secretUpdateIntervalSeconds: secretUpdateIntervalSeconds,
-		tourLength:                  tourLength,
-		guideSecrets:                guideSecrets,
-		hashCalc:                    hashCalc,
+		host:                 host,
+		port:                 port,
+		secretLength:         secretLength,
+		secretUpdateInterval: secretUpdateInterval,
+		tourLength:           tourLength,
+		guideSecrets:         guideSecrets,
+		hashCalc:             hashCalc,
 
 		rand: rand,
 	}
@@ -105,7 +105,7 @@ func (s *Server) handleRequest(conn net.Conn) {
 		data, err = s.tourCompleteRequestHandler(conn, request)
 	default:
 		logrus.WithField("type", request.Type).Error("unsupported request type")
-		data, err = s.unsupportedRequestHandler(conn)
+		data = s.unsupportedRequestHandler()
 	}
 
 	if err != nil {
@@ -141,7 +141,7 @@ func (s *Server) updateSecret() error {
 }
 
 func (s *Server) periodicSecretUpdate() {
-	ticker := time.NewTicker(s.secretUpdateIntervalSeconds)
+	ticker := time.NewTicker(s.secretUpdateInterval)
 	for range ticker.C {
 		err := s.updateSecret()
 		if err != nil {

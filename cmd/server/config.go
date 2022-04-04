@@ -11,10 +11,10 @@ type config struct {
 	Host string `envconfig:"HOST"`
 	Port string `envconfig:"PORT"`
 
-	SecretLength                int           `envconfig:"SECRET_LENGTH"`
-	SecretUpdateIntervalSeconds time.Duration `envconfig:"SECRET_UPDATE_INTERVAL_SECONDS"`
-	TourLength                  int           `envconfig:"TOUR_LENGTH"`
-	GuideSecrets                []string      `envconfig:"GUIDE_SECRETS"`
+	SecretLength         int           `envconfig:"SECRET_LENGTH"`
+	SecretUpdateInterval time.Duration `envconfig:"SECRET_UPDATE_INTERVAL"`
+	TourLength           int           `envconfig:"TOUR_LENGTH"`
+	GuideSecrets         []string      `envconfig:"GUIDE_SECRETS"`
 
 	Debug bool `envconfig:"RETRY_COUNT"`
 }

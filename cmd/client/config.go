@@ -8,10 +8,10 @@ import (
 )
 
 type config struct {
-	Server                 string        `envconfig:"SERVER"`
-	Guides                 []string      `envconfig:"GUIDES"`
-	RetryCount             int           `envconfig:"RETRY_COUNT"`
-	RequestIntervalSeconds time.Duration `envconfig:"REQUEST_INTERVAL_SECONDS"`
+	Server          string        `envconfig:"SERVER"`
+	Guides          []string      `envconfig:"GUIDES"`
+	RetryCount      int           `envconfig:"RETRY_COUNT"`
+	RequestInterval time.Duration `envconfig:"REQUEST_INTERVAL"`
 
 	Debug bool `envconfig:"DEBUG"`
 }

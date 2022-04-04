@@ -57,6 +57,7 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 			if err != nil {
 				return "", fmt.Errorf("guided tour request: %w", err)
 			}
+
 			quote, err := c.tourCompleteRequest(serviceRestrictedMsg.InitialHash, lastHash)
 
 			if err != nil {
@@ -64,8 +65,10 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 					logrus.Debug("service restricted again")
 					continue
 				}
+
 				return "", fmt.Errorf("tour complete request: %w", err)
 			}
+
 			return quote, nil
 
 		case srvcontracts.UnsupportedRequest:
@@ -86,6 +89,7 @@ func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
 	if err != nil {
 		return response, fmt.Errorf("connect to server: %w", err)
 	}
+
 	writer := msgp.NewWriter(conn)
 
 	err = request.EncodeMsg(writer)
@@ -111,6 +115,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 
 	for i := 1; i < int(serviceRestrictedMsg.TourLength)+1; i++ {
 		logrus.Debugf("tour number: %v", i)
+
 		request := guidecontracts.RequestMsg{
 			PreviousHash: prevHash,
 			TourNumber:   byte(i),
@@ -122,6 +127,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 		if err != nil {
 			return prevHash, fmt.Errorf("connect to guide: %w", err)
 		}
+
 		writer := msgp.NewWriter(conn)
 
 		err = request.EncodeMsg(writer)
@@ -134,6 +140,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 		}
 
 		logrus.Debugf("Guide request sent: %v", request)
+
 		response := guidecontracts.ResponseMsg{}
 		if err := response.DecodeMsg(msgp.NewReader(conn)); err != nil {
 			return prevHash, fmt.Errorf("decode guide response: %w", err)
@@ -148,22 +155,27 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 func (c *Client) tourCompleteRequest(initialHash, lastHash [20]byte) (string, error) {
 	tourCompletePayload := srvcontracts.TourCompletePayload{
 		InitialHash: initialHash, LastHash: lastHash}
+
 	requestPayload, err := tourCompletePayload.MarshalMsg(nil)
 	if err != nil {
 		logrus.Debugf("%v+", tourCompletePayload)
 		return "", fmt.Errorf("marshal tour complete payload: %w", err)
 	}
+
 	request := srvcontracts.RequestMsg{Type: byte(srvcontracts.TourCompleteRequest), Payload: requestPayload}
 
 	conn, err := net.Dial("tcp", c.server)
 	if err != nil {
 		return "", fmt.Errorf("connect to server: %w", err)
 	}
+
 	writer := msgp.NewWriter(conn)
+
 	err = request.EncodeMsg(writer)
 	if err != nil {
 		return "", fmt.Errorf("encode msg: %w", err)
 	}
+
 	if err := writer.Flush(); err != nil {
 		return "", fmt.Errorf("flush writer: %w", err)
 	}
@@ -181,6 +193,7 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [20]byte) (string, er
 		if _, err := serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
 			return "", fmt.Errorf("unmarshal service granted response: %w", err)
 		}
+
 		return serviceGrantedMsg.Quote, nil
 	case srvcontracts.ServiceRestricted:
 		return "", errServiceRestricted

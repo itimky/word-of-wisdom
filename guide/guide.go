@@ -6,20 +6,21 @@ import (
 	"github.com/tinylib/msgp/msgp"
 	"net"
 	guidecontracts "word-of-wisom/internal/contracts/guide"
-	"word-of-wisom/internal/gtp"
 )
 
 type Guide struct {
-	host   string
-	port   string
-	secret string
+	host     string
+	port     string
+	secret   string
+	hashCalc HashCalc
 }
 
-func NewGuide(host, port, secret string) *Guide {
+func NewGuide(host, port, secret string, hashCalc HashCalc) *Guide {
 	return &Guide{
-		host:   host,
-		port:   port,
-		secret: secret,
+		host:     host,
+		port:     port,
+		secret:   secret,
+		hashCalc: hashCalc,
 	}
 }
 
@@ -62,7 +63,7 @@ func (g *Guide) handleRequest(conn net.Conn) {
 
 	logrus.Debug(request)
 
-	hash := gtp.NewGTP().CalcGuideHash(request.PreviousHash, int(request.TourNumber), int(request.TourLength), g.getClientIP(conn), g.secret)
+	hash := g.hashCalc.CalcGuideHash(request.PreviousHash, int(request.TourNumber), int(request.TourLength), g.getClientIP(conn), g.secret)
 	response := guidecontracts.ResponseMsg{Hash: hash}
 	writer := msgp.NewWriter(conn)
 	if err := response.EncodeMsg(writer); err != nil {

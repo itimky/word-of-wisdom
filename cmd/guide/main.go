@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
+	"time"
 	"word-of-wisom/guide"
+	"word-of-wisom/internal/gtp"
 )
 
 func main() {
@@ -16,7 +18,7 @@ func main() {
 	}
 	logrus.Debugf("%+v", conf)
 
-	g := guide.NewGuide(conf.Host, conf.Port, conf.Secret)
+	g := guide.NewGuide(conf.Host, conf.Port, conf.Secret, gtp.NewGTP(time.Now))
 	if err := g.Run(); err != nil {
 		logrus.WithError(err).Fatal("cannot run guide")
 	}

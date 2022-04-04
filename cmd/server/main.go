@@ -25,7 +25,7 @@ func main() {
 		10, 2,
 		5,
 		conf.GuideSecrets,
-		gtp.NewGTP(),
+		gtp.NewGTP(time.Now),
 		rand.New(rand.NewSource(time.Now().Unix())),
 	)
 	if err := srv.Run(); err != nil {

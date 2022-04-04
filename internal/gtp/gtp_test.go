@@ -13,7 +13,7 @@ func now() time.Time {
 
 type GTPSuite struct {
 	suite.Suite
-	gtp GTP
+	gtp *GTP
 }
 
 func (s *GTPSuite) SetupSuite() {

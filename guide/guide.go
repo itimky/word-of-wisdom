@@ -63,8 +63,8 @@ func (g *Guide) handleRequest(conn net.Conn) {
 
 	logrus.Debug(request)
 
-	hash := g.hashCalc.CalcGuideHash(request.PreviousHash, int(request.TourNumber), int(request.TourLength), g.getClientIP(conn), g.secret)
-	response := guidecontracts.ResponseMsg{Hash: hash}
+	response := g.tourGuideHandler(conn, request)
+
 	writer := msgp.NewWriter(conn)
 	if err := response.EncodeMsg(writer); err != nil {
 		logrus.WithError(err).WithField("data", response).Error("encode msg")

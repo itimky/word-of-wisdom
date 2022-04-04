@@ -1,7 +1,7 @@
 package gtp
 
 import (
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec
 	"math/big"
 	"strconv"
 	"time"
@@ -18,14 +18,17 @@ func NewGTP(now func() time.Time) *GTP {
 }
 
 func (gtp *GTP) timestamp() string {
-	return gtp.now().UTC().Round(60 * time.Second).String()
+	// TODO: move precision to config
+	return gtp.now().UTC().Round(time.Minute).String()
 }
 
 func (gtp *GTP) CalcInitialHash(clientIP string, tourLength int, secret string) Hash {
+	//nolint:gosec
 	return sha1.Sum([]byte(clientIP + strconv.Itoa(tourLength) + gtp.timestamp() + secret))
 }
 
 func (gtp *GTP) CalcGuideHash(prevHash Hash, tourNumber int, tourLength int, clientIP string, secret string) Hash {
+	//nolint:gosec
 	return sha1.Sum([]byte(string(prevHash[:]) + strconv.Itoa(tourNumber) + strconv.Itoa(tourLength) + clientIP + gtp.timestamp() + secret))
 }
 

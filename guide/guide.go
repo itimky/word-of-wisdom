@@ -2,11 +2,12 @@ package guide
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"github.com/tinylib/msgp/msgp"
 	"net"
 	"word-of-wisom/internal"
 	guidecontracts "word-of-wisom/internal/contracts/guide"
+
+	"github.com/sirupsen/logrus"
+	"github.com/tinylib/msgp/msgp"
 )
 
 type Guide struct {
@@ -30,12 +31,14 @@ func (g *Guide) Run() error {
 	if err != nil {
 		return fmt.Errorf("run server listener: %w", err)
 	}
+
 	defer func(l net.Listener) {
 		err := l.Close()
 		if err != nil {
 			logrus.WithError(err).Error("close listener")
 		}
 	}(l)
+
 	logrus.Infof("Listening on %v", g.hostPort())
 
 	for {
@@ -44,6 +47,7 @@ func (g *Guide) Run() error {
 			logrus.WithError(err).Error("accept connection")
 			continue
 		}
+
 		go g.handleRequest(conn)
 	}
 }
@@ -72,6 +76,7 @@ func (g *Guide) handleRequest(conn net.Conn) {
 		logrus.WithError(err).WithField("data", response).Error("encode msg")
 		return
 	}
+
 	if err := writer.Flush(); err != nil {
 		logrus.WithError(err).Error("flush response")
 	}

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
 	"time"
 	"word-of-wisom/client"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -17,11 +18,12 @@ func main() {
 	if conf.Debug {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
+
 	logrus.Debugf("%+v", conf)
 
 	cl := client.NewClient(conf.Server, conf.Guides)
 
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(conf.RequestIntervalSeconds * time.Second)
 	for range ticker.C {
 		quote, err := cl.RequestQuote(conf.RetryCount)
 		if err != nil {

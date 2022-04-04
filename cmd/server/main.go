@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
 	"word-of-wisom/internal/gtp"
 	"word-of-wisom/server"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -22,11 +23,12 @@ func main() {
 	srv := server.NewServer(
 		conf.Host,
 		conf.Port,
-		10, 2,
-		5,
+		conf.SecretLength,
+		conf.SecretUpdateIntervalSeconds,
+		conf.TourLength,
 		conf.GuideSecrets,
 		gtp.NewGTP(time.Now),
-		rand.New(rand.NewSource(time.Now().Unix())),
+		rand.New(rand.NewSource(time.Now().Unix())), //nolint:gosec
 	)
 	if err := srv.Run(); err != nil {
 		logrus.WithError(err).Fatal("cannot run server")

@@ -2,9 +2,10 @@ package server
 
 import (
 	"fmt"
-	"github.com/tinylib/msgp/msgp"
 	"net"
 	srvcontracts "word-of-wisom/internal/contracts/server"
+
+	"github.com/tinylib/msgp/msgp"
 )
 
 func (s *Server) initialRequestHandler(conn net.Conn) (msgp.Encodable, error) {

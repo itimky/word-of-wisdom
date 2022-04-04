@@ -1,13 +1,14 @@
 package guide
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net"
 	"testing"
 	"word-of-wisom/guide/mocks"
 	guidecontracts "word-of-wisom/internal/contracts/guide"
 	"word-of-wisom/internal/gtp"
 	utilmocks "word-of-wisom/internal/testutils/mocks"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGuide_handleRequest(t *testing.T) {

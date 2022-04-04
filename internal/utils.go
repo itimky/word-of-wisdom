@@ -1,8 +1,9 @@
 package internal
 
 import (
-	"github.com/sirupsen/logrus"
 	"runtime/debug"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Recovery() {

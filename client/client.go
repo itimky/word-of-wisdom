@@ -3,15 +3,16 @@ package client
 import (
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"github.com/tinylib/msgp/msgp"
 	"net"
 	guidecontracts "word-of-wisom/internal/contracts/guide"
 	srvcontracts "word-of-wisom/internal/contracts/server"
 	"word-of-wisom/internal/gtp"
+
+	"github.com/sirupsen/logrus"
+	"github.com/tinylib/msgp/msgp"
 )
 
-var serviceRestrictedError = errors.New("service restricted error")
+var errServiceRestricted = errors.New("service restricted error")
 
 type Client struct {
 	server string
@@ -35,17 +36,20 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 		switch srvcontracts.ResponseType(response.Type) {
 		case srvcontracts.ServiceGranted:
 			serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
-			if _, err := serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
+			if _, err = serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
 				return "", fmt.Errorf("unmarshal service granted response: %w", err)
 			}
+
 			logrus.Debug("service granted msg")
 			logrus.Debugf("%v+", serviceGrantedMsg)
+
 			return serviceGrantedMsg.Quote, nil
 		case srvcontracts.ServiceRestricted:
 			serviceRestrictedMsg := srvcontracts.ServiceRestrictedPayload{}
-			if _, err := serviceRestrictedMsg.UnmarshalMsg(response.Payload); err != nil {
+			if _, err = serviceRestrictedMsg.UnmarshalMsg(response.Payload); err != nil {
 				return "", fmt.Errorf("unmarshal service restricted response: %w", err)
 			}
+
 			logrus.Debug("service restricted msg")
 			logrus.Debugf("%v+", serviceRestrictedMsg)
 
@@ -54,8 +58,9 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 				return "", fmt.Errorf("guided tour request: %w", err)
 			}
 			quote, err := c.tourCompleteRequest(serviceRestrictedMsg.InitialHash, lastHash)
+
 			if err != nil {
-				if errors.Is(err, serviceRestrictedError) {
+				if errors.Is(err, errServiceRestricted) {
 					logrus.Debug("service restricted again")
 					continue
 				}
@@ -82,10 +87,12 @@ func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
 		return response, fmt.Errorf("connect to server: %w", err)
 	}
 	writer := msgp.NewWriter(conn)
+
 	err = request.EncodeMsg(writer)
 	if err != nil {
 		return response, fmt.Errorf("encode msg: %w", err)
 	}
+
 	if err := writer.Flush(); err != nil {
 		return response, fmt.Errorf("flush writer: %w", err)
 	}
@@ -101,6 +108,7 @@ func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
 
 func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRestrictedPayload) ([20]byte, error) {
 	prevHash := serviceRestrictedMsg.InitialHash
+
 	for i := 1; i < int(serviceRestrictedMsg.TourLength)+1; i++ {
 		logrus.Debugf("tour number: %v", i)
 		request := guidecontracts.RequestMsg{
@@ -115,10 +123,12 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 			return prevHash, fmt.Errorf("connect to guide: %w", err)
 		}
 		writer := msgp.NewWriter(conn)
+
 		err = request.EncodeMsg(writer)
 		if err != nil {
 			return prevHash, fmt.Errorf("encode msg: %w", err)
 		}
+
 		if err := writer.Flush(); err != nil {
 			return prevHash, fmt.Errorf("flush writer: %w", err)
 		}
@@ -173,7 +183,7 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [20]byte) (string, er
 		}
 		return serviceGrantedMsg.Quote, nil
 	case srvcontracts.ServiceRestricted:
-		return "", serviceRestrictedError
+		return "", errServiceRestricted
 	case srvcontracts.UnsupportedRequest:
 		return "", fmt.Errorf("unsupported request")
 	default:

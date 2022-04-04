@@ -1,8 +1,6 @@
 package server
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"math/rand"
 	"net"
 	"testing"
@@ -11,6 +9,9 @@ import (
 	"word-of-wisom/internal/gtp"
 	utilmocks "word-of-wisom/internal/testutils/mocks"
 	"word-of-wisom/server/mocks"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type ServerSuite struct {

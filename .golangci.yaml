@@ -12,7 +12,7 @@ linters-settings:
       - performance
       - style
   govet:
-    check-shadowing: true
+    check-shadowing: false
   nolintlint:
     require-explanation: true
     require-specific: true
@@ -26,6 +26,7 @@ issues:
         - errcheck
         - dupl
         - gosec
+        - goconst
 linters:
   disable-all: true
   enable:
@@ -64,6 +65,15 @@ linters:
     - varcheck
     - whitespace
     - wsl
-
+disable:
+  - bodyclose
+  - gosimple
+  - staticcheck
+  - structcheck
+  - stylecheck
+  - tparallel
+  - unparam
 run:
   issues-exit-code: 1
+output:
+  sort-results: true

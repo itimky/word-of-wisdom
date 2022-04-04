@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
 type config struct {
-	Server     string   `envconfig:"SERVER"`
-	Guides     []string `envconfig:"GUIDES"`
-	RetryCount int      `envconfig:"RETRY_COUNT"`
+	Server                 string        `envconfig:"SERVER"`
+	Guides                 []string      `envconfig:"GUIDES"`
+	RetryCount             int           `envconfig:"RETRY_COUNT"`
+	RequestIntervalSeconds time.Duration `envconfig:"REQUEST_INTERVAL_SECONDS"`
 
 	Debug bool `envconfig:"DEBUG"`
 }

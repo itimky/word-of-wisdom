@@ -2,20 +2,21 @@ package server
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"github.com/tinylib/msgp/msgp"
 	"math/rand"
 	"net"
 	"time"
 	"word-of-wisom/internal"
 	srvcontracts "word-of-wisom/internal/contracts/server"
+
+	"github.com/sirupsen/logrus"
+	"github.com/tinylib/msgp/msgp"
 )
 
 type Server struct {
 	host                        string
 	port                        string
 	secretLength                int
-	secretUpdateIntervalMinutes time.Duration
+	secretUpdateIntervalSeconds time.Duration
 	secret                      string
 	tourLength                  int
 	guideSecrets                []string
@@ -28,7 +29,7 @@ func NewServer(
 	host string,
 	port string,
 	secretLength int,
-	secretUpdateIntervalMinutes time.Duration,
+	secretUpdateIntervalSeconds time.Duration,
 	tourLength int,
 	guideSecrets []string,
 	hashCalc HashCalc,
@@ -38,7 +39,7 @@ func NewServer(
 		host:                        host,
 		port:                        port,
 		secretLength:                secretLength,
-		secretUpdateIntervalMinutes: secretUpdateIntervalMinutes,
+		secretUpdateIntervalSeconds: secretUpdateIntervalSeconds,
 		tourLength:                  tourLength,
 		guideSecrets:                guideSecrets,
 		hashCalc:                    hashCalc,
@@ -140,7 +141,7 @@ func (s *Server) updateSecret() error {
 }
 
 func (s *Server) periodicSecretUpdate() {
-	ticker := time.NewTicker(s.secretUpdateIntervalMinutes * time.Minute)
+	ticker := time.NewTicker(s.secretUpdateIntervalSeconds * time.Minute)
 	for range ticker.C {
 		err := s.updateSecret()
 		if err != nil {

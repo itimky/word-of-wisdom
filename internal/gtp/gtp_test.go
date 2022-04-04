@@ -1,10 +1,11 @@
 package gtp
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 func now() time.Time {

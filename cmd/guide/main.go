@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
 	"time"
 	"word-of-wisom/guide"
 	"word-of-wisom/internal/gtp"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {

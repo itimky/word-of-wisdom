@@ -2,8 +2,9 @@ package server
 
 import (
 	"crypto/rand"
-	"github.com/pkg/errors"
 	"math/big"
+
+	"github.com/pkg/errors"
 )
 
 func randomSecret(n int) (string, error) {

@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
 	"net"
+	"word-of-wisom/internal"
 	guidecontracts "word-of-wisom/internal/contracts/guide"
 )
 
@@ -48,6 +49,7 @@ func (g *Guide) Run() error {
 }
 
 func (g *Guide) handleRequest(conn net.Conn) {
+	defer internal.Recovery()
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {

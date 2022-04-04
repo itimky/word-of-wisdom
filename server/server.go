@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net"
 	"time"
+	"word-of-wisom/internal"
 	srvcontracts "word-of-wisom/internal/contracts/server"
 )
 
@@ -77,6 +78,7 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) handleRequest(conn net.Conn) {
+	defer internal.Recovery()
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {

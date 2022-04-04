@@ -18,12 +18,11 @@ func main() {
 	if conf.Debug {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
-
 	logrus.Debugf("%+v", conf)
 
 	cl := client.NewClient(conf.Server, conf.Guides)
 
-	ticker := time.NewTicker(conf.RequestIntervalSeconds * time.Second)
+	ticker := time.NewTicker(conf.RequestIntervalSeconds)
 	for range ticker.C {
 		quote, err := cl.RequestQuote(conf.RetryCount)
 		if err != nil {

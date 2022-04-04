@@ -141,7 +141,7 @@ func (s *Server) updateSecret() error {
 }
 
 func (s *Server) periodicSecretUpdate() {
-	ticker := time.NewTicker(s.secretUpdateIntervalSeconds * time.Minute)
+	ticker := time.NewTicker(s.secretUpdateIntervalSeconds)
 	for range ticker.C {
 		err := s.updateSecret()
 		if err != nil {

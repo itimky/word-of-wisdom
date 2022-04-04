@@ -24,7 +24,7 @@ func main() {
 		conf.Host,
 		conf.Port,
 		conf.SecretLength,
-		conf.SecretUpdateIntervalSeconds,
+		time.Duration(conf.SecretUpdateIntervalSeconds),
 		conf.TourLength,
 		conf.GuideSecrets,
 		gtp.NewGTP(time.Now),

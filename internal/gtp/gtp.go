@@ -21,20 +21,9 @@ func (gtp GTP) timestamp() string {
 	return gtp.now().UTC().Round(60 * time.Second).String()
 }
 
-//
-//func (gtp GTP) NewInitialGTPMsg(clientIP string, tourLength int, secret string) contracts.GTPMResponse {
-//	hash := sha1.Sum([]byte(clientIP + strconv.Itoa(tourLength) + gtp.timestamp() + secret))
-//	return contracts.GTPMResponse{Hash: hash, TourLength: byte(tourLength)}
-//}
-
 func (gtp GTP) CalcInitialHash(clientIP string, tourLength int, secret string) Hash {
 	return sha1.Sum([]byte(clientIP + strconv.Itoa(tourLength) + gtp.timestamp() + secret))
 }
-
-//func (gtp GTP) NewGTPMsg(prevHash [20]byte, tourNumber int, tourLength int, clientIP string, secret string) contracts.GTPMResponse {
-//	hash := sha1.Sum([]byte(string(prevHash[:]) + strconv.Itoa(tourNumber) + strconv.Itoa(tourLength) + clientIP + gtp.timestamp() + secret))
-//	return contracts.GTPMResponse{Hash: hash, TourLength: byte(tourLength), TourNumber: byte(tourNumber)}
-//}
 
 func (gtp GTP) CalcGuideHash(prevHash Hash, tourNumber int, tourLength int, clientIP string, secret string) Hash {
 	return sha1.Sum([]byte(string(prevHash[:]) + strconv.Itoa(tourNumber) + strconv.Itoa(tourLength) + clientIP + gtp.timestamp() + secret))

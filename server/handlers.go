@@ -5,11 +5,10 @@ import (
 	"github.com/tinylib/msgp/msgp"
 	"net"
 	srvcontracts "word-of-wisom/internal/contracts/server"
-	"word-of-wisom/internal/gtp"
 )
 
 func (s *Server) initialRequestHandler(conn net.Conn) (msgp.Encodable, error) {
-	initialHash := gtp.NewGTP().CalcInitialHash(s.getClientIP(conn), s.tourLength, s.secret)
+	initialHash := s.hashCalc.CalcInitialHash(s.getClientIP(conn), s.tourLength, s.secret)
 	serviceRestrictedPayload := srvcontracts.ServiceRestrictedPayload{InitialHash: initialHash, TourLength: byte(s.tourLength)}
 	responsePayload, err := serviceRestrictedPayload.MarshalMsg(nil)
 	if err != nil {
@@ -26,7 +25,7 @@ func (s *Server) tourCompleteRequestHandler(conn net.Conn, requestMsg srvcontrac
 		return nil, fmt.Errorf("unmarshal tour complete request payload: %w", err)
 	}
 	var response msgp.Encodable
-	if gtp.NewGTP().VerifyHash(requestPayload.InitialHash, requestPayload.LastHash, s.tourLength, s.getClientIP(conn), s.secret, s.guideSecrets) {
+	if s.hashCalc.VerifyHash(requestPayload.InitialHash, requestPayload.LastHash, s.tourLength, s.getClientIP(conn), s.secret, s.guideSecrets) {
 		serviceGrantedPayload, err := srvcontracts.ServiceGrantedPayload{Quote: quotes[s.rand.Intn(len(quotes))]}.MarshalMsg(nil)
 		if err != nil {
 			return nil, fmt.Errorf("marshal service granted payload: %w", err)

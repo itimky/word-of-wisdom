@@ -18,6 +18,7 @@ type Server struct {
 	secret                      string
 	tourLength                  int
 	guideSecrets                []string
+	hashCalc                    HashCalc
 
 	rand *rand.Rand
 }
@@ -29,6 +30,8 @@ func NewServer(
 	secretUpdateIntervalMinutes time.Duration,
 	tourLength int,
 	guideSecrets []string,
+	hashCalc HashCalc,
+	rand *rand.Rand,
 ) *Server {
 	return &Server{
 		host:                        host,
@@ -37,8 +40,9 @@ func NewServer(
 		secretUpdateIntervalMinutes: secretUpdateIntervalMinutes,
 		tourLength:                  tourLength,
 		guideSecrets:                guideSecrets,
+		hashCalc:                    hashCalc,
 
-		rand: rand.New(rand.NewSource(time.Now().Unix())),
+		rand: rand,
 	}
 }
 
@@ -96,8 +100,6 @@ func (s *Server) handleRequest(conn net.Conn) {
 		data, err = s.initialRequestHandler(conn)
 	case srvcontracts.TourCompleteRequest:
 		data, err = s.tourCompleteRequestHandler(conn, request)
-		//gtp.NewGTP().VerifyHash()
-		// response with quote if ok
 	default:
 		logrus.WithField("type", request.Type).Error("unsupported request type")
 		data, err = s.unsupportedRequestHandler(conn)

@@ -2,6 +2,9 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
+	"math/rand"
+	"time"
+	"word-of-wisom/internal/gtp"
 	"word-of-wisom/server"
 )
 
@@ -16,7 +19,15 @@ func main() {
 	}
 	logrus.Debugf("%+v", conf)
 
-	srv := server.NewServer(conf.Host, conf.Port, 10, 2, 5, conf.GuideSecrets)
+	srv := server.NewServer(
+		conf.Host,
+		conf.Port,
+		10, 2,
+		5,
+		conf.GuideSecrets,
+		gtp.NewGTP(),
+		rand.New(rand.NewSource(time.Now().Unix())),
+	)
 	if err := srv.Run(); err != nil {
 		logrus.WithError(err).Fatal("cannot run server")
 	}

@@ -1,6 +1,6 @@
 package guide
 
-import "word-of-wisom/internal/gtp"
+import "word-of-wisom/pkg/gtp"
 
 //go:generate mockery --name HashCalc --with-expecter=true
 

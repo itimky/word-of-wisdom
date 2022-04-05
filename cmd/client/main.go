@@ -2,7 +2,7 @@ package main
 
 import (
 	"time"
-	"word-of-wisom/client"
+	"word-of-wisom/internal/client"
 
 	"github.com/sirupsen/logrus"
 )

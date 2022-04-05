@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"net"
 	"time"
-	"word-of-wisom/internal"
-	srvcontracts "word-of-wisom/internal/contracts/server"
+	srvcontracts "word-of-wisom/api/server"
+	"word-of-wisom/pkg/utils"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
@@ -79,7 +79,7 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) handleRequest(conn net.Conn) {
-	defer internal.Recovery()
+	defer utils.Recovery()
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {

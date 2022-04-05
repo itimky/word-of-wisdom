@@ -3,8 +3,8 @@ package guide
 import (
 	"fmt"
 	"net"
-	"word-of-wisom/internal"
-	guidecontracts "word-of-wisom/internal/contracts/guide"
+	guidecontracts "word-of-wisom/api/guide"
+	"word-of-wisom/pkg/utils"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
@@ -53,7 +53,7 @@ func (g *Guide) Run() error {
 }
 
 func (g *Guide) handleRequest(conn net.Conn) {
-	defer internal.Recovery()
+	defer utils.Recovery()
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {

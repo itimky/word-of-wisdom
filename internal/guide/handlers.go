@@ -2,7 +2,7 @@ package guide
 
 import (
 	"net"
-	guidecontracts "word-of-wisom/internal/contracts/guide"
+	guidecontracts "word-of-wisom/api/guide"
 
 	"github.com/tinylib/msgp/msgp"
 )

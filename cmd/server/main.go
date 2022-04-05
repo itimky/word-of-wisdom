@@ -3,8 +3,8 @@ package main
 import (
 	"math/rand"
 	"time"
-	"word-of-wisom/internal/gtp"
-	"word-of-wisom/server"
+	"word-of-wisom/internal/server"
+	"word-of-wisom/pkg/gtp"
 
 	"github.com/sirupsen/logrus"
 )

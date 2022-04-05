@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"net"
-	srvcontracts "word-of-wisom/internal/contracts/server"
+	srvcontracts "word-of-wisom/api/server"
 
 	"github.com/tinylib/msgp/msgp"
 )

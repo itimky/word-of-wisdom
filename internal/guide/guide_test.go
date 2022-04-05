@@ -3,10 +3,10 @@ package guide
 import (
 	"net"
 	"testing"
-	"word-of-wisom/guide/mocks"
-	guidecontracts "word-of-wisom/internal/contracts/guide"
-	"word-of-wisom/internal/gtp"
-	utilmocks "word-of-wisom/internal/testutils/mocks"
+	guidecontracts "word-of-wisom/api/guide"
+	"word-of-wisom/internal/guide/mocks"
+	"word-of-wisom/pkg/gtp"
+	utilmocks "word-of-wisom/pkg/testutils/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

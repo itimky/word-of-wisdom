@@ -49,4 +49,9 @@ tasks:
     cmds:
       - golangci-lint run --disable-all --enable=goimports --fix
 
+  generate:
+    desc: "Generate all files"
+    cmds:
+      - go generate ./...
+
 

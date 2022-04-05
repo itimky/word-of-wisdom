@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	guidecontracts "word-of-wisom/internal/contracts/guide"
-	srvcontracts "word-of-wisom/internal/contracts/server"
-	"word-of-wisom/internal/gtp"
+	guidecontracts "word-of-wisom/api/guide"
+	srvcontracts "word-of-wisom/api/server"
+	"word-of-wisom/pkg/gtp"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"

@@ -2,8 +2,8 @@ package main
 
 import (
 	"time"
-	"word-of-wisom/guide"
-	"word-of-wisom/internal/gtp"
+	"word-of-wisom/internal/guide"
+	"word-of-wisom/pkg/gtp"
 
 	"github.com/sirupsen/logrus"
 )

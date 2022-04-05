@@ -1,0 +1,52 @@
+version: '3'
+
+silent: true
+
+tasks:
+  build:target:
+    cmds:
+      - go build -o ./bin/"{{.TARGET}}" ./cmd/{{.TARGET}}
+    sources:
+      - ./*.go
+    generates:
+      - ./bin/{{.TARGET}}
+  build:client:
+    desc: "Build client"
+    cmds:
+      - task: build:target
+        vars: {TARGET: client}
+  build:server:
+    desc: "Build server"
+    cmds:
+      - task: build:target
+        vars: { TARGET: server }
+  build:guide:
+    desc: "Build guide"
+    cmds:
+      - task: build:target
+        vars: { TARGET: guide }
+  build:
+    desc: "Build all"
+    deps: [build:client, build:server, build:guide]
+
+  install:dev:
+    desc: "Install developer tools"
+    cmds:
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+      - go install github.com/tinylib/msgp@v1.1.6
+  install:
+    desc: "Install dependencies"
+    cmds:
+      - go mod download
+
+  lint:
+    desc: "Run linter check"
+    cmds:
+      - golangci-lint run
+
+  format:
+    desc: "Format source code"
+    cmds:
+      - golangci-lint run --disable-all --enable=goimports --fix
+
+

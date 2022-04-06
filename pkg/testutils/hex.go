@@ -1,14 +1,14 @@
 package testutils
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"word-of-wisom/pkg/gtp"
+
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
 func HexHash(hexStr string) gtp.Hash {
-	if len(hexStr) != 2*sha256.Size {
+	if len(hexStr) != 2*gtp.HashSize {
 		panic(fmt.Sprintf("wrong hash size (%v)", len(hexStr)))
 	}
 

@@ -1,7 +1,6 @@
 package gtp
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"testing"
@@ -18,7 +17,7 @@ func now() time.Time {
 }
 
 func HexHash(hexStr string) Hash {
-	if len(hexStr) != 2*sha256.Size {
+	if len(hexStr) != 2*HashSize {
 		panic(fmt.Sprintf("wrong hash size (%v)", len(hexStr)))
 	}
 

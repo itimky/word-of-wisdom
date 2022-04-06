@@ -8,7 +8,9 @@ import (
 	"time"
 )
 
-type Hash [32]byte
+const HashSize = sha256.Size
+
+type Hash [HashSize]byte
 
 func (h Hash) String() string {
 	return fmt.Sprintf("%X", h[:])

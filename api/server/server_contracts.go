@@ -1,6 +1,9 @@
 package server
 
-import "github.com/tinylib/msgp/msgp"
+import (
+	"github.com/itimky/word-of-wisom/api"
+	"github.com/tinylib/msgp/msgp"
+)
 
 //go:generate msgp
 
@@ -17,8 +20,8 @@ type RequestMsg struct {
 }
 
 type TourCompletePayload struct {
-	InitialHash [32]byte
-	LastHash    [32]byte
+	InitialHash api.Hash
+	LastHash    api.Hash
 }
 
 // --------------------------
@@ -37,7 +40,7 @@ type ResponseMsg struct {
 }
 
 type ServiceRestrictedPayload struct {
-	InitialHash [32]byte
+	InitialHash api.Hash
 	TourLength  byte
 }
 

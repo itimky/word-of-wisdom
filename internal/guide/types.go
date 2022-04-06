@@ -1,8 +1,8 @@
 package guide
 
 import (
-	guidecontracts "word-of-wisom/api/guide"
-	"word-of-wisom/pkg/gtp"
+	guidecontracts "github.com/itimky/word-of-wisom/api/guide"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 
 	"github.com/tinylib/msgp/msgp"
 )
@@ -15,7 +15,7 @@ type Request struct {
 
 func newRequestFromMsg(msg guidecontracts.RequestMsg) Request {
 	return Request{
-		PreviousHash: msg.PreviousHash,
+		PreviousHash: gtp.Hash(msg.PreviousHash),
 		TourNumber:   int(msg.TourNumber),
 		TourLength:   int(msg.TourLength),
 	}

@@ -67,5 +67,7 @@ linters:
 #    - wsl
 run:
   issues-exit-code: 1
+#  skip-files:
+#    - ".*\\.pb\\.go"
 output:
   sort-results: true

@@ -3,10 +3,11 @@ package main
 import (
 	"math/rand"
 	"time"
-	"word-of-wisom/internal/server"
-	"word-of-wisom/pkg/gtp"
-	"word-of-wisom/pkg/quotes"
-	"word-of-wisom/pkg/tcpserver"
+
+	"github.com/itimky/word-of-wisom/internal/server"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
+	"github.com/itimky/word-of-wisom/pkg/quotes"
+	"github.com/itimky/word-of-wisom/pkg/tcpserver"
 
 	"github.com/sirupsen/logrus"
 )

@@ -2,9 +2,10 @@ package main
 
 import (
 	"time"
-	"word-of-wisom/internal/guide"
-	"word-of-wisom/pkg/gtp"
-	"word-of-wisom/pkg/tcpserver"
+
+	"github.com/itimky/word-of-wisom/internal/guide"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
+	"github.com/itimky/word-of-wisom/pkg/tcpserver"
 
 	"github.com/sirupsen/logrus"
 )

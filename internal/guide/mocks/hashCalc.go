@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	gtp "word-of-wisom/pkg/gtp"
+	gtp "github.com/itimky/word-of-wisom/pkg/gtp"
 
 	mock "github.com/stretchr/testify/mock"
 )

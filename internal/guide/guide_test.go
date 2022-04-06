@@ -3,8 +3,9 @@ package guide
 import (
 	"net"
 	"testing"
-	"word-of-wisom/internal/guide/mocks"
-	"word-of-wisom/pkg/testutils"
+
+	"github.com/itimky/word-of-wisom/internal/guide/mocks"
+	"github.com/itimky/word-of-wisom/pkg/testutils"
 
 	"github.com/stretchr/testify/assert"
 )

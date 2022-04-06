@@ -3,8 +3,9 @@ package guide
 import (
 	"fmt"
 	"net"
-	guidecontracts "word-of-wisom/api/guide"
-	"word-of-wisom/pkg/tcpserver"
+
+	guidecontracts "github.com/itimky/word-of-wisom/api/guide"
+	"github.com/itimky/word-of-wisom/pkg/tcpserver"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"

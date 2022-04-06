@@ -3,8 +3,9 @@ package server
 import (
 	"fmt"
 	"net"
-	srvcontracts "word-of-wisom/api/server"
-	"word-of-wisom/pkg/tcpserver"
+
+	srvapi "github.com/itimky/word-of-wisom/api/server"
+	"github.com/itimky/word-of-wisom/pkg/tcpserver"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
@@ -40,7 +41,7 @@ func NewServer(
 }
 
 func (s *Server) HandleRequest(conn net.Conn) (msgp.Encodable, error) {
-	requestMsg := srvcontracts.RequestMsg{}
+	requestMsg := srvapi.RequestMsg{}
 	if err := requestMsg.DecodeMsg(msgp.NewReader(conn)); err != nil {
 		return nil, fmt.Errorf("decode message: %w", err)
 	}
@@ -48,10 +49,10 @@ func (s *Server) HandleRequest(conn net.Conn) (msgp.Encodable, error) {
 	logrus.Debug(requestMsg)
 
 	var result encodabler
-	switch srvcontracts.RequestType(requestMsg.Type) {
-	case srvcontracts.InitialRequest:
+	switch srvapi.RequestType(requestMsg.Type) {
+	case srvapi.InitialRequest:
 		result = s.initialRequestHandler(tcpserver.GetClientIP(conn))
-	case srvcontracts.TourCompleteRequest:
+	case srvapi.TourCompleteRequest:
 		request, err := NewTourCompleteRequestFromMsg(requestMsg)
 		if err != nil {
 			return nil, fmt.Errorf("new tour complete request from msg: %w", err)

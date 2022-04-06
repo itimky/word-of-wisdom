@@ -1,4 +1,4 @@
-module word-of-wisom
+module github.com/itimky/word-of-wisom
 
 go 1.17
 

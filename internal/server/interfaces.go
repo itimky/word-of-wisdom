@@ -1,7 +1,7 @@
 package server
 
 import (
-	"word-of-wisom/pkg/gtp"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
 //go:generate mockery --name hashCalc --exported=true --with-expecter=true

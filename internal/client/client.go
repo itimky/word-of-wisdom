@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	guidecontracts "word-of-wisom/api/guide"
-	srvcontracts "word-of-wisom/api/server"
-	"word-of-wisom/pkg/gtp"
+
+	guidecontracts "github.com/itimky/word-of-wisom/api/guide"
+	srvcontracts "github.com/itimky/word-of-wisom/api/server"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
@@ -121,7 +122,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 			TourNumber:   byte(i),
 			TourLength:   serviceRestrictedMsg.TourLength,
 		}
-		guide := c.guides[gtp.GuideIndex(prevHash, len(c.guides))]
+		guide := c.guides[gtp.GuideIndex(gtp.Hash(prevHash), len(c.guides))]
 
 		conn, err := net.Dial("tcp", guide)
 		if err != nil {

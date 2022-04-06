@@ -2,8 +2,10 @@ package server
 
 import (
 	"fmt"
-	srvcontracts "word-of-wisom/api/server"
-	"word-of-wisom/pkg/gtp"
+
+	"github.com/itimky/word-of-wisom/api"
+	srvcontracts "github.com/itimky/word-of-wisom/api/server"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 
 	"github.com/tinylib/msgp/msgp"
 )
@@ -20,8 +22,8 @@ func NewTourCompleteRequestFromMsg(msg srvcontracts.RequestMsg) (TourCompleteReq
 		return tourCompleteRequest, fmt.Errorf("unmarshal tour complete request payload: %w", err)
 	}
 
-	tourCompleteRequest.InitialHash = requestPayload.InitialHash
-	tourCompleteRequest.LastHash = requestPayload.LastHash
+	tourCompleteRequest.InitialHash = gtp.Hash(requestPayload.InitialHash)
+	tourCompleteRequest.LastHash = gtp.Hash(requestPayload.LastHash)
 
 	return tourCompleteRequest, nil
 }
@@ -36,7 +38,7 @@ type ServiceRestrictedResponse struct {
 }
 
 func (r ServiceRestrictedResponse) Encodable() (msgp.Encodable, error) {
-	serviceRestrictedPayload := srvcontracts.ServiceRestrictedPayload{InitialHash: r.InitialHash, TourLength: byte(r.TourLength)}
+	serviceRestrictedPayload := srvcontracts.ServiceRestrictedPayload{InitialHash: api.Hash(r.InitialHash), TourLength: byte(r.TourLength)}
 
 	responsePayload, err := serviceRestrictedPayload.MarshalMsg(nil)
 	if err != nil {

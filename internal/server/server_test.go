@@ -3,10 +3,11 @@ package server
 import (
 	"math/rand"
 	"testing"
-	"word-of-wisom/internal/server/mocks"
-	"word-of-wisom/pkg/quotes"
-	"word-of-wisom/pkg/testutils"
-	utilmocks "word-of-wisom/pkg/testutils/mocks"
+
+	"github.com/itimky/word-of-wisom/internal/server/mocks"
+	"github.com/itimky/word-of-wisom/pkg/quotes"
+	"github.com/itimky/word-of-wisom/pkg/testutils"
+	utilmocks "github.com/itimky/word-of-wisom/pkg/testutils/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"

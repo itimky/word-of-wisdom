@@ -3,40 +3,24 @@ package guide
 import (
 	"net"
 	"testing"
-	guidecontracts "word-of-wisom/api/guide"
 	"word-of-wisom/internal/guide/mocks"
-	"word-of-wisom/pkg/gtp"
-	utilmocks "word-of-wisom/pkg/testutils/mocks"
+	"word-of-wisom/pkg/testutils"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGuide_handleRequest(t *testing.T) {
-	host := "host"
-	port := "port"
+func TestGuide_tourGuideHandler(t *testing.T) {
 	clientIP := &net.TCPAddr{IP: []byte{127, 0, 0, 1}}
 	secret := "secret1"
 	tourNumber := 2
 	tourLength := 5
-	prevHash := [20]byte{188, 50, 238, 132, 222, 117, 223, 120, 12, 44, 45, 67, 206, 160, 197, 63, 165, 211, 117, 233}
-	newHash := [20]byte{180, 50, 238, 132, 222, 117, 223, 120, 12, 44, 45, 67, 206, 160, 197, 63, 165, 211, 117, 233}
-
-	request := guidecontracts.RequestMsg{
-		PreviousHash: prevHash,
-		TourNumber:   byte(tourNumber),
-		TourLength:   byte(tourLength),
-	}
-
-	connMock := &utilmocks.Conn{}
-	connMock.EXPECT().RemoteAddr().Return(clientIP)
+	hash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 
 	hashCalcMock := &mocks.HashCalc{}
-	hashCalcMock.EXPECT().CalcGuideHash(gtp.Hash(request.PreviousHash), int(request.TourNumber),
-		int(request.TourLength), clientIP.IP.String(), secret).Return(newHash)
+	hashCalcMock.EXPECT().CalcGuideHash(hash, tourNumber, tourLength, clientIP.IP.String(), secret).Return(hash)
 
-	guide := NewGuide(host, port, secret, hashCalcMock)
-	response := guide.tourGuideHandler(connMock, request)
-	assert.IsType(t, &guidecontracts.ResponseMsg{}, response)
-	responseMsg := response.(*guidecontracts.ResponseMsg)
-	assert.Equal(t, newHash, responseMsg.Hash)
+	guide := NewGuide(secret, hashCalcMock)
+	request := Request{PreviousHash: hash, TourNumber: tourNumber, TourLength: tourLength}
+	response := guide.tourGuideHandler(request, clientIP.IP.String())
+	assert.Equal(t, hash, response.Hash)
 }

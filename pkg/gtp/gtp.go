@@ -1,13 +1,18 @@
 package gtp
 
 import (
-	"crypto/sha1" //nolint:gosec
+	"crypto/sha256"
+	"fmt"
 	"math/big"
 	"strconv"
 	"time"
 )
 
-type Hash [20]byte
+type Hash [32]byte
+
+func (h Hash) String() string {
+	return fmt.Sprintf("%X", h[:])
+}
 
 type GTP struct {
 	now func() time.Time
@@ -23,13 +28,11 @@ func (gtp *GTP) timestamp() string {
 }
 
 func (gtp *GTP) CalcInitialHash(clientIP string, tourLength int, secret string) Hash {
-	//nolint:gosec
-	return sha1.Sum([]byte(clientIP + strconv.Itoa(tourLength) + gtp.timestamp() + secret))
+	return sha256.Sum256([]byte(clientIP + strconv.Itoa(tourLength) + gtp.timestamp() + secret))
 }
 
 func (gtp *GTP) CalcGuideHash(prevHash Hash, tourNumber, tourLength int, clientIP, secret string) Hash {
-	//nolint:gosec
-	return sha1.Sum([]byte(string(prevHash[:]) + strconv.Itoa(tourNumber) + strconv.Itoa(tourLength) + clientIP + gtp.timestamp() + secret))
+	return sha256.Sum256([]byte(string(prevHash[:]) + strconv.Itoa(tourNumber) + strconv.Itoa(tourLength) + clientIP + gtp.timestamp() + secret))
 }
 
 func (gtp *GTP) VerifyHash(initialHash, lastHash Hash, tourLength int, clientIP, secret string, guideSecrets []string) bool {

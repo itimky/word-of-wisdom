@@ -4,6 +4,7 @@ import (
 	"time"
 	"word-of-wisom/internal/guide"
 	"word-of-wisom/pkg/gtp"
+	"word-of-wisom/pkg/tcpserver"
 
 	"github.com/sirupsen/logrus"
 )
@@ -20,8 +21,13 @@ func main() {
 
 	logrus.Debugf("%+v", conf)
 
-	g := guide.NewGuide(conf.Host, conf.Port, conf.Secret, gtp.NewGTP(time.Now))
-	if err := g.Run(); err != nil {
+	g := guide.NewGuide(conf.Secret, gtp.NewGTP(time.Now))
+	tcpServer := tcpserver.NewTCPServer(
+		conf.Host,
+		conf.Port,
+		g,
+	)
+	if err := tcpServer.Run(); err != nil {
 		logrus.WithError(err).Fatal("cannot run guide")
 	}
 }

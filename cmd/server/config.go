@@ -16,7 +16,7 @@ type config struct {
 	TourLength           int           `envconfig:"TOUR_LENGTH"`
 	GuideSecrets         []string      `envconfig:"GUIDE_SECRETS"`
 
-	Debug bool `envconfig:"RETRY_COUNT"`
+	Debug bool `envconfig:"DEBUG"`
 }
 
 func loadConfig() (config, error) {

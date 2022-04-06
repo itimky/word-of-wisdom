@@ -17,8 +17,8 @@ type RequestMsg struct {
 }
 
 type TourCompletePayload struct {
-	InitialHash [20]byte
-	LastHash    [20]byte
+	InitialHash [32]byte
+	LastHash    [32]byte
 }
 
 // --------------------------
@@ -37,7 +37,7 @@ type ResponseMsg struct {
 }
 
 type ServiceRestrictedPayload struct {
-	InitialHash [20]byte
+	InitialHash [32]byte
 	TourLength  byte
 }
 

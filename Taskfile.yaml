@@ -34,6 +34,7 @@ tasks:
     cmds:
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
       - go install github.com/tinylib/msgp@v1.1.6
+      - go install github.com/vektra/mockery/v2@v2.10.2
   install:
     desc: "Install dependencies"
     cmds:
@@ -53,5 +54,17 @@ tasks:
     desc: "Generate all files"
     cmds:
       - go generate ./...
+
+  test:all:
+    desc: "Run all tests"
+    cmds:
+      - go test ./...
+
+  run:
+    desc: "Run"
+    cmds:
+      - docker-compose down
+      - docker-compose build
+      - docker-compose up
 
 

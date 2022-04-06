@@ -155,7 +155,7 @@ func (z *RequestMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *RequestMsg) Msgsize() (s int) {
-	s = 1 + 13 + msgp.ArrayHeaderSize + (20 * (msgp.ByteSize)) + 11 + msgp.ByteSize + 11 + msgp.ByteSize
+	s = 1 + 13 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize)) + 11 + msgp.ByteSize + 11 + msgp.ByteSize
 	return
 }
 
@@ -258,6 +258,6 @@ func (z *ResponseMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *ResponseMsg) Msgsize() (s int) {
-	s = 1 + 5 + msgp.ArrayHeaderSize + (20 * (msgp.ByteSize))
+	s = 1 + 5 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize))
 	return
 }

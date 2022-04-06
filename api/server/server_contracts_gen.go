@@ -601,7 +601,7 @@ func (z *ServiceRestrictedPayload) UnmarshalMsg(bts []byte) (o []byte, err error
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *ServiceRestrictedPayload) Msgsize() (s int) {
-	s = 1 + 12 + msgp.ArrayHeaderSize + (20 * (msgp.ByteSize)) + 11 + msgp.ByteSize
+	s = 1 + 12 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize)) + 11 + msgp.ByteSize
 	return
 }
 
@@ -729,6 +729,6 @@ func (z *TourCompletePayload) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *TourCompletePayload) Msgsize() (s int) {
-	s = 1 + 12 + msgp.ArrayHeaderSize + (20 * (msgp.ByteSize)) + 9 + msgp.ArrayHeaderSize + (20 * (msgp.ByteSize))
+	s = 1 + 12 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize)) + 9 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize))
 	return
 }

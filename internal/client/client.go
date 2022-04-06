@@ -110,7 +110,7 @@ func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
 	return response, nil
 }
 
-func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRestrictedPayload) ([20]byte, error) {
+func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRestrictedPayload) ([32]byte, error) {
 	prevHash := serviceRestrictedMsg.InitialHash
 
 	for i := 1; i < int(serviceRestrictedMsg.TourLength)+1; i++ {
@@ -152,7 +152,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 	return prevHash, nil
 }
 
-func (c *Client) tourCompleteRequest(initialHash, lastHash [20]byte) (string, error) {
+func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, error) {
 	tourCompletePayload := srvcontracts.TourCompletePayload{
 		InitialHash: initialHash, LastHash: lastHash}
 

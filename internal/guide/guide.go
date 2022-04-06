@@ -4,88 +4,47 @@ import (
 	"fmt"
 	"net"
 	guidecontracts "word-of-wisom/api/guide"
-	"word-of-wisom/pkg/utils"
+	"word-of-wisom/pkg/tcpserver"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
 )
 
 type Guide struct {
-	host     string
-	port     string
 	secret   string
-	hashCalc HashCalc
+	hashCalc hashCalc
 }
 
-func NewGuide(host, port, secret string, hashCalc HashCalc) *Guide {
+func NewGuide(secret string, hashCalc hashCalc) *Guide {
 	return &Guide{
-		host:     host,
-		port:     port,
 		secret:   secret,
 		hashCalc: hashCalc,
 	}
 }
 
-func (g *Guide) Run() error {
-	l, err := net.Listen("tcp", g.hostPort())
+func (g *Guide) HandleRequest(conn net.Conn) (msgp.Encodable, error) {
+	requestMsg := guidecontracts.RequestMsg{}
+	if err := requestMsg.DecodeMsg(msgp.NewReader(conn)); err != nil {
+		return nil, fmt.Errorf("decode message: %w", err)
+	}
+
+	request := newRequestFromMsg(requestMsg)
+
+	logrus.Debugf("%v+", request)
+
+	response := g.tourGuideHandler(request, tcpserver.GetClientIP(conn))
+
+	responseMsg, err := response.Encodable()
 	if err != nil {
-		return fmt.Errorf("run server listener: %w", err)
+		return nil, fmt.Errorf("encodable: %w", err)
 	}
 
-	defer func(l net.Listener) {
-		err := l.Close()
-		if err != nil {
-			logrus.WithError(err).Error("close listener")
-		}
-	}(l)
-
-	logrus.Infof("Listening on %v", g.hostPort())
-
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			logrus.WithError(err).Error("accept connection")
-			continue
-		}
-
-		go g.handleRequest(conn)
-	}
+	return responseMsg, nil
 }
 
-func (g *Guide) handleRequest(conn net.Conn) {
-	defer utils.Recovery()
-	defer func(conn net.Conn) {
-		err := conn.Close()
-		if err != nil {
-			logrus.WithError(err).Error("close connection")
-		}
-	}(conn)
+func (g *Guide) tourGuideHandler(request Request, clientIP string) Response {
+	hash := g.hashCalc.CalcGuideHash(request.PreviousHash, request.TourNumber, request.TourLength, clientIP, g.secret)
+	response := Response{Hash: hash}
 
-	request := guidecontracts.RequestMsg{}
-	if err := request.DecodeMsg(msgp.NewReader(conn)); err != nil {
-		logrus.WithError(err).Error("decode message")
-		return
-	}
-
-	logrus.Debug(request)
-
-	response := g.tourGuideHandler(conn, request)
-
-	writer := msgp.NewWriter(conn)
-	if err := response.EncodeMsg(writer); err != nil {
-		logrus.WithError(err).WithField("data", response).Error("encode msg")
-		return
-	}
-
-	if err := writer.Flush(); err != nil {
-		logrus.WithError(err).Error("flush response")
-	}
-}
-
-func (g *Guide) getClientIP(conn net.Conn) string {
-	return conn.RemoteAddr().(*net.TCPAddr).IP.String()
-}
-
-func (g *Guide) hostPort() string {
-	return g.host + ":" + g.port
+	return response
 }

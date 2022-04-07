@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"github.com/itimky/word-of-wisom/pkg/utils"
+
 	"github.com/itimky/word-of-wisom/internal/tcp/client"
 
 	"github.com/sirupsen/logrus"
@@ -16,9 +18,7 @@ func main() {
 		logrus.WithError(err).Fatal("cannot init client")
 	}
 
-	if conf.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
+	utils.SetupLogrus(conf.Debug)
 
 	logrus.Debugf("%+v", conf)
 
@@ -32,6 +32,6 @@ func main() {
 			continue
 		}
 
-		logrus.Infof("Quote: %v", quote)
+		logrus.Infof("Quote: %v\n\n", quote)
 	}
 }

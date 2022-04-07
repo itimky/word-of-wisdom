@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/itimky/word-of-wisom/pkg/utils"
+
 	"github.com/itimky/word-of-wisom/internal/service/quote"
 	"github.com/itimky/word-of-wisom/internal/service/shield"
 	"github.com/itimky/word-of-wisom/internal/tcp/server"
@@ -19,9 +21,7 @@ func main() {
 		logrus.WithError(err).Fatal("cannot init server")
 	}
 
-	if conf.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
+	utils.SetupLogrus(conf.Debug)
 
 	logrus.Debugf("%+v", conf)
 

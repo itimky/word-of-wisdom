@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/itimky/word-of-wisom/pkg/utils"
+
 	"github.com/itimky/word-of-wisom/internal/tcp/guide"
 
 	"github.com/itimky/word-of-wisom/pkg/gtp"
@@ -16,9 +18,7 @@ func main() {
 		logrus.WithError(err).Fatal("cannot init guide")
 	}
 
-	if conf.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
+	utils.SetupLogrus(conf.Debug)
 
 	logrus.Debugf("%+v", conf)
 

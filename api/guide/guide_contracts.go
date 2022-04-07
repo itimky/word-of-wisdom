@@ -11,6 +11,5 @@ type RequestMsg struct {
 }
 
 type ResponseMsg struct {
-	PreviousHash api.Hash `msg:"previous_hash,extension"`
-	Hash         api.Hash `msg:"hash,extension"`
+	Hash api.Hash `msg:"hash,extension"`
 }

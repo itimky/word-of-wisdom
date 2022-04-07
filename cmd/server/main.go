@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
-	"github.com/itimky/word-of-wisom/internal/server"
-	"github.com/itimky/word-of-wisom/pkg/gtp"
-	"github.com/itimky/word-of-wisom/pkg/quotes"
-	"github.com/itimky/word-of-wisom/pkg/tcpserver"
+	"github.com/itimky/word-of-wisom/internal/service/quote"
+	"github.com/itimky/word-of-wisom/internal/service/shield"
+	"github.com/itimky/word-of-wisom/internal/tcp/server"
 
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,34 +25,32 @@ func main() {
 
 	logrus.Debugf("%+v", conf)
 
-	srv := server.NewServer(
-		conf.SecretLength,
-		conf.TourLength,
-		conf.GuideSecrets,
-		gtp.NewGTP(time.Now),
-		quotes.NewQuoteRandomizer(rand.New(rand.NewSource(time.Now().Unix()))), //nolint:gosec
+	hashCalc := gtp.NewGTP(time.Now)
+
+	//nolint:gosec
+	// Just random item, no security
+	quoteSvc := quote.NewService(rand.New(rand.NewSource(time.Now().Unix())))
+
+	shieldSvc := shield.NewService(
+		shield.Config{
+			TourLength:           conf.TourLength,
+			SecretLength:         conf.SecretLength,
+			SecretUpdateInterval: conf.SecretUpdateInterval,
+			GuideSecrets:         conf.GuideSecrets,
+		},
+		hashCalc,
+		quoteSvc,
 	)
-	err = srv.UpdateSecret()
-	if err != nil {
-		logrus.WithError(err).Fatal("update secret")
+	if err = shieldSvc.Init(); err != nil {
+		logrus.WithError(err).Fatal("shield service init")
 	}
 
-	go func() {
-		ticker := time.NewTicker(conf.SecretUpdateInterval)
-		for range ticker.C {
-			err := srv.UpdateSecret()
-			if err != nil {
-				logrus.WithError(err).Error("periodic secret update")
-			}
-		}
-	}()
-
-	tcpServer := tcpserver.NewTCPServer(
-		conf.Host,
-		conf.Port,
-		srv,
+	srv := server.NewServer(
+		shieldSvc,
+		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
+		conf.Multicore,
 	)
-	if err := tcpServer.Run(); err != nil {
-		logrus.WithError(err).Fatal("cannot run server")
+	if err = srv.Run(); err != nil {
+		logrus.WithError(err).Fatal("server run")
 	}
 }

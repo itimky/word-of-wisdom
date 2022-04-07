@@ -7,8 +7,9 @@ import (
 )
 
 type config struct {
-	Host string `envconfig:"HOST"`
-	Port string `envconfig:"PORT"`
+	Host      string `envconfig:"HOST"`
+	Port      string `envconfig:"PORT"`
+	Multicore bool   `envconfig:"MULTICORE"`
 
 	Secret string `envconfig:"SECRET"`
 

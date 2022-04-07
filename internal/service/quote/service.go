@@ -1,14 +1,14 @@
-package quotes
+package quote
 
 import "math/rand"
 
-type QuoteRandomizer struct {
+type Service struct {
 	rnd    *rand.Rand
 	quotes []string
 }
 
-func NewQuoteRandomizer(rnd *rand.Rand) QuoteRandomizer {
-	return QuoteRandomizer{
+func NewService(rnd *rand.Rand) *Service {
+	return &Service{
 		rnd: rnd,
 		quotes: []string{
 			"The best way out is always through",
@@ -25,6 +25,6 @@ func NewQuoteRandomizer(rnd *rand.Rand) QuoteRandomizer {
 	}
 }
 
-func (qr QuoteRandomizer) Get() string {
+func (qr *Service) Get() string {
 	return qr.quotes[qr.rnd.Intn(len(qr.quotes))]
 }

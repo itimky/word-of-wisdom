@@ -4,7 +4,6 @@ package mocks
 
 import (
 	gtp "github.com/itimky/word-of-wisom/pkg/gtp"
-
 	mock "github.com/stretchr/testify/mock"
 )
 

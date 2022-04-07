@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/itimky/word-of-wisom/internal/guide"
-	"github.com/itimky/word-of-wisom/pkg/gtp"
-	"github.com/itimky/word-of-wisom/pkg/tcpserver"
+	"github.com/itimky/word-of-wisom/internal/tcp/guide"
 
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,13 +22,13 @@ func main() {
 
 	logrus.Debugf("%+v", conf)
 
-	g := guide.NewGuide(conf.Secret, gtp.NewGTP(time.Now))
-	tcpServer := tcpserver.NewTCPServer(
-		conf.Host,
-		conf.Port,
-		g,
+	g := guide.NewGuide(
+		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
+		conf.Multicore,
+		conf.Secret,
+		gtp.NewGTP(time.Now),
 	)
-	if err := tcpServer.Run(); err != nil {
-		logrus.WithError(err).Fatal("cannot run guide")
+	if err = g.Run(); err != nil {
+		logrus.WithError(err).Fatal("guide run")
 	}
 }

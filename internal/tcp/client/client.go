@@ -71,8 +71,10 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 			}
 
 			return quote, nil
-
-		case srvcontracts.UnsupportedRequest:
+		case srvcontracts.WrongPuzzle:
+			// TODO: add WrongPuzzle handling
+			return "", nil
+		case srvcontracts.Unsupported:
 			return "", fmt.Errorf("unsupported request: %w", err)
 		default:
 			return "", fmt.Errorf("unknown response type: %v", response.Type)
@@ -83,7 +85,7 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 }
 
 func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
-	request := srvcontracts.RequestMsg{Type: srvcontracts.InitialRequest}
+	request := srvcontracts.RequestMsg{Type: srvcontracts.Initial}
 	response := srvcontracts.ResponseMsg{}
 
 	conn, err := net.Dial("tcp", c.server)
@@ -163,7 +165,7 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 		return "", fmt.Errorf("marshal tour complete payload: %w", err)
 	}
 
-	request := srvcontracts.RequestMsg{Type: srvcontracts.TourCompleteRequest, Payload: requestPayload}
+	request := srvcontracts.RequestMsg{Type: srvcontracts.TourComplete, Payload: requestPayload}
 
 	conn, err := net.Dial("tcp", c.server)
 	if err != nil {
@@ -198,7 +200,10 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 		return serviceGrantedMsg.Quote, nil
 	case srvcontracts.ServiceRestricted:
 		return "", errServiceRestricted
-	case srvcontracts.UnsupportedRequest:
+	case srvcontracts.WrongPuzzle:
+		// TODO: add WrongPuzzle handling
+		return "", nil
+	case srvcontracts.Unsupported:
 		return "", fmt.Errorf("unsupported request")
 	default:
 		return "", fmt.Errorf("unknown response type: %v", response.Type)

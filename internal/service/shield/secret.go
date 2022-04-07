@@ -1,4 +1,4 @@
-package server
+package shield
 
 import (
 	"crypto/rand"

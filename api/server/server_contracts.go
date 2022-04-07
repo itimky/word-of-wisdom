@@ -10,8 +10,8 @@ import (
 type RequestType byte
 
 const (
-	InitialRequest      RequestType = 0
-	TourCompleteRequest RequestType = 1
+	Initial      RequestType = 0
+	TourComplete RequestType = 1
 )
 
 type RequestMsg struct {
@@ -29,10 +29,10 @@ type TourCompletePayload struct {
 type ResponseType byte
 
 const (
-	UnsupportedRequest ResponseType = 0
-	ServiceRestricted  ResponseType = 1
-	//WrongPuzzle        ResponseType = 2
-	ServiceGranted ResponseType = 3
+	Unsupported       ResponseType = 0
+	ServiceRestricted ResponseType = 1
+	WrongPuzzle       ResponseType = 2
+	ServiceGranted    ResponseType = 3
 )
 
 type ResponseMsg struct {

@@ -43,12 +43,17 @@ tasks:
     cmds:
       - go mod download
 
+  tidy:
+    desc: "Tidy go modules"
+    cmds:
+      - go mod tidy
+
   lint:
     desc: "Run linter check"
     cmds:
       - golangci-lint run
 
-  format:
+  fmt:
     desc: "Format source code"
     cmds:
       - golangci-lint run --disable-all --enable=goimports --fix

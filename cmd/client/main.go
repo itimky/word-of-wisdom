@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/itimky/word-of-wisom/internal/client"
+	"github.com/itimky/word-of-wisom/internal/tcp/client"
 
 	"github.com/sirupsen/logrus"
 )

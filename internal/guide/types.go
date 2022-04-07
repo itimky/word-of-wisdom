@@ -1,6 +1,7 @@
 package guide
 
 import (
+	"github.com/itimky/word-of-wisom/api"
 	guidecontracts "github.com/itimky/word-of-wisom/api/guide"
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 
@@ -26,6 +27,6 @@ type Response struct {
 }
 
 func (r Response) Encodable() (msgp.Encodable, error) {
-	responseMsg := guidecontracts.ResponseMsg{Hash: r.Hash}
+	responseMsg := guidecontracts.ResponseMsg{Hash: api.Hash(r.Hash)}
 	return &responseMsg, nil
 }

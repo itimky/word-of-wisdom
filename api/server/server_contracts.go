@@ -15,13 +15,13 @@ const (
 )
 
 type RequestMsg struct {
-	Type    byte
-	Payload msgp.Raw // TourCompletePayload
+	Type    RequestType `msg:"type"`
+	Payload msgp.Raw    `msg:"payload"` // nil, TourCompletePayload
 }
 
 type TourCompletePayload struct {
-	InitialHash api.Hash
-	LastHash    api.Hash
+	InitialHash api.Hash `msg:"initial_hash,extension"`
+	LastHash    api.Hash `msg:"last_hash,extension"`
 }
 
 // --------------------------
@@ -29,21 +29,22 @@ type TourCompletePayload struct {
 type ResponseType byte
 
 const (
-	ServiceGranted     ResponseType = 0
+	UnsupportedRequest ResponseType = 0
 	ServiceRestricted  ResponseType = 1
-	UnsupportedRequest ResponseType = 2
+	//WrongPuzzle        ResponseType = 2
+	ServiceGranted ResponseType = 3
 )
 
 type ResponseMsg struct {
-	Type    byte
-	Payload msgp.Raw // ServiceRestrictedPayload, ServiceGrantedPayload
+	Type    ResponseType `msg:"type"`
+	Payload msgp.Raw     `msg:"payload"` // nil, ServiceRestrictedPayload, ServiceGrantedPayload
 }
 
 type ServiceRestrictedPayload struct {
-	InitialHash api.Hash
-	TourLength  byte
+	InitialHash api.Hash `msg:"initial_hash,extension"`
+	TourLength  byte     `msg:"tour_length"`
 }
 
 type ServiceGrantedPayload struct {
-	Quote string
+	Quote string `msg:"quote"`
 }

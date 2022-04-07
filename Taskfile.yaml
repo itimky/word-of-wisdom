@@ -1,5 +1,7 @@
 version: '3'
 
+dotenv: ['./config/.env']
+
 tasks:
   build:target:
     cmds:
@@ -65,6 +67,13 @@ tasks:
     desc: "Run all tests"
     cmds:
       - go test ./...
+
+  run:server:
+    deps: [build:server]
+    desc: "Run server"
+    cmds:
+      - echo $WOW_SERVER
+      - bin/server
 
   run:
     desc: "Run"

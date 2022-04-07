@@ -24,19 +24,19 @@ func (z *RequestMsg) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "PreviousHash":
-			err = dc.ReadExactBytes((z.PreviousHash)[:])
+		case "previous_hash":
+			err = dc.ReadExtension(&z.PreviousHash)
 			if err != nil {
 				err = msgp.WrapError(err, "PreviousHash")
 				return
 			}
-		case "TourNumber":
+		case "tour_number":
 			z.TourNumber, err = dc.ReadByte()
 			if err != nil {
 				err = msgp.WrapError(err, "TourNumber")
 				return
 			}
-		case "TourLength":
+		case "tour_length":
 			z.TourLength, err = dc.ReadByte()
 			if err != nil {
 				err = msgp.WrapError(err, "TourLength")
@@ -54,20 +54,20 @@ func (z *RequestMsg) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z *RequestMsg) EncodeMsg(en *msgp.Writer) (err error) {
+func (z RequestMsg) EncodeMsg(en *msgp.Writer) (err error) {
 	// map header, size 3
-	// write "PreviousHash"
-	err = en.Append(0x83, 0xac, 0x50, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x48, 0x61, 0x73, 0x68)
+	// write "previous_hash"
+	err = en.Append(0x83, 0xad, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x5f, 0x68, 0x61, 0x73, 0x68)
 	if err != nil {
 		return
 	}
-	err = en.WriteBytes((z.PreviousHash)[:])
+	err = en.WriteExtension(&z.PreviousHash)
 	if err != nil {
 		err = msgp.WrapError(err, "PreviousHash")
 		return
 	}
-	// write "TourNumber"
-	err = en.Append(0xaa, 0x54, 0x6f, 0x75, 0x72, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72)
+	// write "tour_number"
+	err = en.Append(0xab, 0x74, 0x6f, 0x75, 0x72, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72)
 	if err != nil {
 		return
 	}
@@ -76,8 +76,8 @@ func (z *RequestMsg) EncodeMsg(en *msgp.Writer) (err error) {
 		err = msgp.WrapError(err, "TourNumber")
 		return
 	}
-	// write "TourLength"
-	err = en.Append(0xaa, 0x54, 0x6f, 0x75, 0x72, 0x4c, 0x65, 0x6e, 0x67, 0x74, 0x68)
+	// write "tour_length"
+	err = en.Append(0xab, 0x74, 0x6f, 0x75, 0x72, 0x5f, 0x6c, 0x65, 0x6e, 0x67, 0x74, 0x68)
 	if err != nil {
 		return
 	}
@@ -90,17 +90,21 @@ func (z *RequestMsg) EncodeMsg(en *msgp.Writer) (err error) {
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z *RequestMsg) MarshalMsg(b []byte) (o []byte, err error) {
+func (z RequestMsg) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// map header, size 3
-	// string "PreviousHash"
-	o = append(o, 0x83, 0xac, 0x50, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x48, 0x61, 0x73, 0x68)
-	o = msgp.AppendBytes(o, (z.PreviousHash)[:])
-	// string "TourNumber"
-	o = append(o, 0xaa, 0x54, 0x6f, 0x75, 0x72, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72)
+	// string "previous_hash"
+	o = append(o, 0x83, 0xad, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x5f, 0x68, 0x61, 0x73, 0x68)
+	o, err = msgp.AppendExtension(o, &z.PreviousHash)
+	if err != nil {
+		err = msgp.WrapError(err, "PreviousHash")
+		return
+	}
+	// string "tour_number"
+	o = append(o, 0xab, 0x74, 0x6f, 0x75, 0x72, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72)
 	o = msgp.AppendByte(o, z.TourNumber)
-	// string "TourLength"
-	o = append(o, 0xaa, 0x54, 0x6f, 0x75, 0x72, 0x4c, 0x65, 0x6e, 0x67, 0x74, 0x68)
+	// string "tour_length"
+	o = append(o, 0xab, 0x74, 0x6f, 0x75, 0x72, 0x5f, 0x6c, 0x65, 0x6e, 0x67, 0x74, 0x68)
 	o = msgp.AppendByte(o, z.TourLength)
 	return
 }
@@ -123,19 +127,19 @@ func (z *RequestMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "PreviousHash":
-			bts, err = msgp.ReadExactBytes(bts, (z.PreviousHash)[:])
+		case "previous_hash":
+			bts, err = msgp.ReadExtensionBytes(bts, &z.PreviousHash)
 			if err != nil {
 				err = msgp.WrapError(err, "PreviousHash")
 				return
 			}
-		case "TourNumber":
+		case "tour_number":
 			z.TourNumber, bts, err = msgp.ReadByteBytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "TourNumber")
 				return
 			}
-		case "TourLength":
+		case "tour_length":
 			z.TourLength, bts, err = msgp.ReadByteBytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "TourLength")
@@ -154,8 +158,8 @@ func (z *RequestMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *RequestMsg) Msgsize() (s int) {
-	s = 1 + 13 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize)) + 11 + msgp.ByteSize + 11 + msgp.ByteSize
+func (z RequestMsg) Msgsize() (s int) {
+	s = 1 + 14 + msgp.ExtensionPrefixSize + z.PreviousHash.Len() + 12 + msgp.ByteSize + 12 + msgp.ByteSize
 	return
 }
 
@@ -177,8 +181,14 @@ func (z *ResponseMsg) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "Hash":
-			err = dc.ReadExactBytes((z.Hash)[:])
+		case "previous_hash":
+			err = dc.ReadExtension(&z.PreviousHash)
+			if err != nil {
+				err = msgp.WrapError(err, "PreviousHash")
+				return
+			}
+		case "hash":
+			err = dc.ReadExtension(&z.Hash)
 			if err != nil {
 				err = msgp.WrapError(err, "Hash")
 				return
@@ -195,14 +205,24 @@ func (z *ResponseMsg) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z *ResponseMsg) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 1
-	// write "Hash"
-	err = en.Append(0x81, 0xa4, 0x48, 0x61, 0x73, 0x68)
+func (z ResponseMsg) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 2
+	// write "previous_hash"
+	err = en.Append(0x82, 0xad, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x5f, 0x68, 0x61, 0x73, 0x68)
 	if err != nil {
 		return
 	}
-	err = en.WriteBytes((z.Hash)[:])
+	err = en.WriteExtension(&z.PreviousHash)
+	if err != nil {
+		err = msgp.WrapError(err, "PreviousHash")
+		return
+	}
+	// write "hash"
+	err = en.Append(0xa4, 0x68, 0x61, 0x73, 0x68)
+	if err != nil {
+		return
+	}
+	err = en.WriteExtension(&z.Hash)
 	if err != nil {
 		err = msgp.WrapError(err, "Hash")
 		return
@@ -211,12 +231,23 @@ func (z *ResponseMsg) EncodeMsg(en *msgp.Writer) (err error) {
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z *ResponseMsg) MarshalMsg(b []byte) (o []byte, err error) {
+func (z ResponseMsg) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 1
-	// string "Hash"
-	o = append(o, 0x81, 0xa4, 0x48, 0x61, 0x73, 0x68)
-	o = msgp.AppendBytes(o, (z.Hash)[:])
+	// map header, size 2
+	// string "previous_hash"
+	o = append(o, 0x82, 0xad, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x5f, 0x68, 0x61, 0x73, 0x68)
+	o, err = msgp.AppendExtension(o, &z.PreviousHash)
+	if err != nil {
+		err = msgp.WrapError(err, "PreviousHash")
+		return
+	}
+	// string "hash"
+	o = append(o, 0xa4, 0x68, 0x61, 0x73, 0x68)
+	o, err = msgp.AppendExtension(o, &z.Hash)
+	if err != nil {
+		err = msgp.WrapError(err, "Hash")
+		return
+	}
 	return
 }
 
@@ -238,8 +269,14 @@ func (z *ResponseMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "Hash":
-			bts, err = msgp.ReadExactBytes(bts, (z.Hash)[:])
+		case "previous_hash":
+			bts, err = msgp.ReadExtensionBytes(bts, &z.PreviousHash)
+			if err != nil {
+				err = msgp.WrapError(err, "PreviousHash")
+				return
+			}
+		case "hash":
+			bts, err = msgp.ReadExtensionBytes(bts, &z.Hash)
 			if err != nil {
 				err = msgp.WrapError(err, "Hash")
 				return
@@ -257,7 +294,7 @@ func (z *ResponseMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *ResponseMsg) Msgsize() (s int) {
-	s = 1 + 5 + msgp.ArrayHeaderSize + (32 * (msgp.ByteSize))
+func (z ResponseMsg) Msgsize() (s int) {
+	s = 1 + 14 + msgp.ExtensionPrefixSize + z.PreviousHash.Len() + 5 + msgp.ExtensionPrefixSize + z.Hash.Len()
 	return
 }

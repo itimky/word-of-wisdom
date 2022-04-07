@@ -11,6 +11,10 @@ import (
 	"github.com/tinylib/msgp/msgp"
 )
 
+type encodabler interface {
+	Encodable() (msgp.Encodable, error)
+}
+
 type quoteGetter interface {
 	Get() string
 }
@@ -49,7 +53,7 @@ func (s *Server) HandleRequest(conn net.Conn) (msgp.Encodable, error) {
 	logrus.Debug(requestMsg)
 
 	var result encodabler
-	switch srvapi.RequestType(requestMsg.Type) {
+	switch requestMsg.Type {
 	case srvapi.InitialRequest:
 		result = s.initialRequestHandler(tcpserver.GetClientIP(conn))
 	case srvapi.TourCompleteRequest:

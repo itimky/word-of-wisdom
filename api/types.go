@@ -15,20 +15,20 @@ func init() {
 
 type Hash gtp.Hash
 
-func (h Hash) String() string {
+func (h *Hash) String() string {
 	return fmt.Sprintf("%X", h[:])
 }
 
-func (h Hash) ExtensionType() int8 { return HashType }
+func (h *Hash) ExtensionType() int8 { return HashType }
 
-func (h Hash) Len() int { return gtp.HashSize }
+func (h *Hash) Len() int { return gtp.HashSize }
 
-func (h Hash) MarshalBinaryTo(b []byte) error {
-	copy(b, h[:])
+func (h *Hash) MarshalBinaryTo(b []byte) error {
+	copy(b, (*h)[:])
 	return nil
 }
 
-func (h Hash) UnmarshalBinary(b []byte) error {
-	copy(h[:], b)
+func (h *Hash) UnmarshalBinary(b []byte) error {
+	copy((*h)[:], b)
 	return nil
 }

@@ -34,7 +34,7 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 			return "", fmt.Errorf("initial request: %w", err)
 		}
 
-		switch srvcontracts.ResponseType(response.Type) {
+		switch response.Type {
 		case srvcontracts.ServiceGranted:
 			serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
 			if _, err = serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 }
 
 func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
-	request := srvcontracts.RequestMsg{Type: byte(srvcontracts.InitialRequest)}
+	request := srvcontracts.RequestMsg{Type: srvcontracts.InitialRequest}
 	response := srvcontracts.ResponseMsg{}
 
 	conn, err := net.Dial("tcp", c.server)
@@ -163,7 +163,7 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 		return "", fmt.Errorf("marshal tour complete payload: %w", err)
 	}
 
-	request := srvcontracts.RequestMsg{Type: byte(srvcontracts.TourCompleteRequest), Payload: requestPayload}
+	request := srvcontracts.RequestMsg{Type: srvcontracts.TourCompleteRequest, Payload: requestPayload}
 
 	conn, err := net.Dial("tcp", c.server)
 	if err != nil {
@@ -188,7 +188,7 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 		return "", fmt.Errorf("decode server response: %w", err)
 	}
 
-	switch srvcontracts.ResponseType(response.Type) {
+	switch response.Type {
 	case srvcontracts.ServiceGranted:
 		serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
 		if _, err := serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {

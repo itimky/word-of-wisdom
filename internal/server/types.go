@@ -28,10 +28,6 @@ func NewTourCompleteRequestFromMsg(msg srvcontracts.RequestMsg) (TourCompleteReq
 	return tourCompleteRequest, nil
 }
 
-type encodabler interface {
-	Encodable() (msgp.Encodable, error)
-}
-
 type ServiceRestrictedResponse struct {
 	InitialHash gtp.Hash
 	TourLength  int
@@ -45,7 +41,7 @@ func (r ServiceRestrictedResponse) Encodable() (msgp.Encodable, error) {
 		return nil, fmt.Errorf("marshal restricted response payload: %w", err)
 	}
 
-	responseMsg := srvcontracts.ResponseMsg{Type: byte(srvcontracts.ServiceRestricted), Payload: responsePayload}
+	responseMsg := srvcontracts.ResponseMsg{Type: srvcontracts.ServiceRestricted, Payload: responsePayload}
 
 	return &responseMsg, nil
 }
@@ -60,13 +56,20 @@ func (r ServiceGrantedResponse) Encodable() (msgp.Encodable, error) {
 		return nil, fmt.Errorf("marshal service granted payload: %w", err)
 	}
 
-	responseMsg := srvcontracts.ResponseMsg{Type: byte(srvcontracts.ServiceGranted), Payload: serviceGrantedPayload}
+	responseMsg := srvcontracts.ResponseMsg{Type: srvcontracts.ServiceGranted, Payload: serviceGrantedPayload}
 	return &responseMsg, nil
 }
+
+//type WrongPuzzleResponse struct{}
+//
+//func (r WrongPuzzleResponse) Encodable() (msgp.Encodable, error) {
+//	responseMsg := srvcontracts.ResponseMsg{Type: srvcontracts.WrongPuzzle}
+//	return &responseMsg, nil
+//}
 
 type UnsupportedRequest struct{}
 
 func (r UnsupportedRequest) Encodable() (msgp.Encodable, error) {
-	responseMsg := srvcontracts.ResponseMsg{Type: byte(srvcontracts.UnsupportedRequest)}
+	responseMsg := srvcontracts.ResponseMsg{Type: srvcontracts.UnsupportedRequest}
 	return &responseMsg, nil
 }

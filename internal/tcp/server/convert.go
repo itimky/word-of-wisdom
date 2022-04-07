@@ -21,7 +21,7 @@ func convertInitialResultToResponseMsg(result shield.InitialResult) (srvapi.Resp
 		return responseMsg, fmt.Errorf("marshal restricted response payload: %w", err)
 	}
 
-	responseMsg.Type = srvapi.ServiceRestricted
+	responseMsg.Type = srvapi.Restricted
 	responseMsg.Payload = responsePayload
 
 	return responseMsg, nil
@@ -43,7 +43,7 @@ func convertRequestMsgToTourCompleteRequest(msg srvapi.RequestMsg) (shield.TourC
 func convertTourCompleteResultToResponseMsg(result shield.TourCompleteResult) (srvapi.ResponseMsg, error) {
 	var responseMsg srvapi.ResponseMsg
 	if result.Granted {
-		responseMsg.Type = srvapi.ServiceGranted
+		responseMsg.Type = srvapi.Granted
 		payload := srvapi.ServiceGrantedPayload{Quote: result.Quote}
 		responsePayload, err := payload.MarshalMsg(nil)
 		if err != nil {

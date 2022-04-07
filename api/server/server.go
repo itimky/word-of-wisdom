@@ -29,10 +29,10 @@ type TourCompletePayload struct {
 type ResponseType byte
 
 const (
-	Unsupported       ResponseType = 0
-	ServiceRestricted ResponseType = 1
-	WrongPuzzle       ResponseType = 2
-	ServiceGranted    ResponseType = 3
+	Unsupported ResponseType = 0
+	Restricted  ResponseType = 1
+	WrongPuzzle ResponseType = 2
+	Granted     ResponseType = 3
 )
 
 type ResponseMsg struct {

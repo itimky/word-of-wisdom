@@ -58,7 +58,7 @@ func (s *Service) HandleInitial(clientIP string) InitialResult {
 	return InitialResult{InitialHash: initialHash, TourLength: s.cfg.TourLength}
 }
 
-func (s *Service) HandleTourComplete(request TourCompleteRequest, clientIP string) TourCompleteResult {
+func (s *Service) HandleTourComplete(clientIP string, request TourCompleteRequest) TourCompleteResult {
 	var response TourCompleteResult
 	if s.hashCalc.VerifyHash(request.InitialHash, request.LastHash, s.cfg.TourLength, clientIP, s.secret, s.cfg.GuideSecrets) {
 		response.Granted = true

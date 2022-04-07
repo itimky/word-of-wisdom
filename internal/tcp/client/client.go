@@ -35,7 +35,7 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 		}
 
 		switch response.Type {
-		case srvcontracts.ServiceGranted:
+		case srvcontracts.Granted:
 			serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
 			if _, err = serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
 				return "", fmt.Errorf("unmarshal service granted response: %w", err)
@@ -45,7 +45,7 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 			logrus.Debugf("%v+", serviceGrantedMsg)
 
 			return serviceGrantedMsg.Quote, nil
-		case srvcontracts.ServiceRestricted:
+		case srvcontracts.Restricted:
 			serviceRestrictedMsg := srvcontracts.ServiceRestrictedPayload{}
 			if _, err = serviceRestrictedMsg.UnmarshalMsg(response.Payload); err != nil {
 				return "", fmt.Errorf("unmarshal service restricted response: %w", err)
@@ -191,14 +191,14 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 	}
 
 	switch response.Type {
-	case srvcontracts.ServiceGranted:
+	case srvcontracts.Granted:
 		serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
 		if _, err := serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
 			return "", fmt.Errorf("unmarshal service granted response: %w", err)
 		}
 
 		return serviceGrantedMsg.Quote, nil
-	case srvcontracts.ServiceRestricted:
+	case srvcontracts.Restricted:
 		return "", errServiceRestricted
 	case srvcontracts.WrongPuzzle:
 		// TODO: add WrongPuzzle handling

@@ -14,19 +14,18 @@ import (
 
 type Server struct {
 	gnet.BuiltinEventEngine
-	//pool   *goroutine.Pool
-	//eng    gnet.Engine
-	shield *shield.Service
 
 	addr      string
 	multicore bool
+
+	shield shieldService
 }
 
-func NewServer(shield *shield.Service, addr string, multicore bool) *Server {
+func NewServer(addr string, multicore bool, serviceSvc shieldService) *Server {
 	return &Server{
-		shield:    shield,
 		addr:      addr,
 		multicore: multicore,
+		shield:    serviceSvc,
 	}
 }
 
@@ -39,7 +38,6 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) OnBoot(eng gnet.Engine) gnet.Action {
-	//s.eng = eng
 	log.Printf("server with multi-core=%t is listening on %s\n", s.multicore, s.addr)
 	return gnet.None
 }
@@ -59,7 +57,7 @@ func (s *Server) handleConnection(conn gnet.Conn) error {
 		return fmt.Errorf("decode message: %w", err)
 	}
 
-	responseMsg, err := s.handleRequest(conn, requestMsg)
+	responseMsg, err := s.handleRequest(tcp.GetClientIP(conn), requestMsg)
 	if err != nil {
 		return fmt.Errorf("handle request: %w", err)
 	}
@@ -77,12 +75,12 @@ func (s *Server) handleConnection(conn gnet.Conn) error {
 	return nil
 }
 
-func (s *Server) handleRequest(conn gnet.Conn, requestMsg srvapi.RequestMsg) (srvapi.ResponseMsg, error) {
+func (s *Server) handleRequest(clientIP string, requestMsg srvapi.RequestMsg) (srvapi.ResponseMsg, error) {
 	var responseMsg srvapi.ResponseMsg
 	var err error
 	switch requestMsg.Type {
 	case srvapi.Initial:
-		result := s.shield.HandleInitial(tcp.GetClientIP(conn))
+		result := s.shield.HandleInitial(clientIP)
 		responseMsg, err = convertInitialResultToResponseMsg(result)
 		if err != nil {
 			return responseMsg, fmt.Errorf("convert initial result")
@@ -93,7 +91,7 @@ func (s *Server) handleRequest(conn gnet.Conn, requestMsg srvapi.RequestMsg) (sr
 		if err != nil {
 			return responseMsg, fmt.Errorf("convert tour complete request: %w", err)
 		}
-		result := s.shield.HandleTourComplete(request, tcp.GetClientIP(conn))
+		result := s.shield.HandleTourComplete(clientIP, request)
 		responseMsg, err = convertTourCompleteResultToResponseMsg(result)
 		if err != nil {
 			return responseMsg, fmt.Errorf("convert tour complete result")

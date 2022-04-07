@@ -16,7 +16,7 @@ tasks:
     desc: "Build client"
     cmds:
       - task: build:target
-        vars: {TARGET: client}
+        vars: { TARGET: client }
   build:server:
     desc: "Build server"
     cmds:
@@ -66,7 +66,12 @@ tasks:
   test:coverage:
     desc: "Run all tests with coverage"
     cmds:
-      - go test -cover ./...
+      - go test -coverprofile {{.COVER_OUT_TMP}} ./api/... ./internal/... ./pkg/...
+      - defer: rm {{.COVER_OUT_TMP}}
+      - cat {{.COVER_OUT_TMP}} | grep -Ev "/mock/|_gen.go|_generated.go" > cover.out
+      - go tool cover -func cover.out
+    vars:
+      COVER_OUT_TMP: cover.out.tmp
 
   test:
     desc: "Run all tests"

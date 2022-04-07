@@ -46,9 +46,9 @@ func main() {
 	}
 
 	srv := server.NewServer(
-		shieldSvc,
 		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
 		conf.Multicore,
+		shieldSvc,
 	)
 	if err = srv.Run(); err != nil {
 		logrus.WithError(err).Fatal("server run")

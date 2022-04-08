@@ -1,4 +1,4 @@
-package shield
+package server
 
 import (
 	"github.com/itimky/word-of-wisom/pkg/gtp"

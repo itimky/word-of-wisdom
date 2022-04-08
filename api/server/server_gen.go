@@ -406,10 +406,51 @@ func (z *RequestMsg) DecodeMsg(dc *msgp.Reader) (err error) {
 				z.Type = RequestType(zb0002)
 			}
 		case "puzzle_solution":
-			err = z.PuzzleSolution.DecodeMsg(dc)
-			if err != nil {
-				err = msgp.WrapError(err, "PuzzleSolution")
-				return
+			if dc.IsNil() {
+				err = dc.ReadNil()
+				if err != nil {
+					err = msgp.WrapError(err, "PuzzleSolution")
+					return
+				}
+				z.PuzzleSolution = nil
+			} else {
+				if z.PuzzleSolution == nil {
+					z.PuzzleSolution = new(PuzzleSolution)
+				}
+				var zb0003 uint32
+				zb0003, err = dc.ReadMapHeader()
+				if err != nil {
+					err = msgp.WrapError(err, "PuzzleSolution")
+					return
+				}
+				for zb0003 > 0 {
+					zb0003--
+					field, err = dc.ReadMapKeyPtr()
+					if err != nil {
+						err = msgp.WrapError(err, "PuzzleSolution")
+						return
+					}
+					switch msgp.UnsafeString(field) {
+					case "initial_hash":
+						err = dc.ReadExtension(&z.PuzzleSolution.InitialHash)
+						if err != nil {
+							err = msgp.WrapError(err, "PuzzleSolution", "InitialHash")
+							return
+						}
+					case "last_hash":
+						err = dc.ReadExtension(&z.PuzzleSolution.LastHash)
+						if err != nil {
+							err = msgp.WrapError(err, "PuzzleSolution", "LastHash")
+							return
+						}
+					default:
+						err = dc.Skip()
+						if err != nil {
+							err = msgp.WrapError(err, "PuzzleSolution")
+							return
+						}
+					}
+				}
 			}
 		default:
 			err = dc.Skip()
@@ -440,10 +481,33 @@ func (z *RequestMsg) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = z.PuzzleSolution.EncodeMsg(en)
-	if err != nil {
-		err = msgp.WrapError(err, "PuzzleSolution")
-		return
+	if z.PuzzleSolution == nil {
+		err = en.WriteNil()
+		if err != nil {
+			return
+		}
+	} else {
+		// map header, size 2
+		// write "initial_hash"
+		err = en.Append(0x82, 0xac, 0x69, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x5f, 0x68, 0x61, 0x73, 0x68)
+		if err != nil {
+			return
+		}
+		err = en.WriteExtension(&z.PuzzleSolution.InitialHash)
+		if err != nil {
+			err = msgp.WrapError(err, "PuzzleSolution", "InitialHash")
+			return
+		}
+		// write "last_hash"
+		err = en.Append(0xa9, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x68, 0x61, 0x73, 0x68)
+		if err != nil {
+			return
+		}
+		err = en.WriteExtension(&z.PuzzleSolution.LastHash)
+		if err != nil {
+			err = msgp.WrapError(err, "PuzzleSolution", "LastHash")
+			return
+		}
 	}
 	return
 }
@@ -457,10 +521,24 @@ func (z *RequestMsg) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.AppendByte(o, byte(z.Type))
 	// string "puzzle_solution"
 	o = append(o, 0xaf, 0x70, 0x75, 0x7a, 0x7a, 0x6c, 0x65, 0x5f, 0x73, 0x6f, 0x6c, 0x75, 0x74, 0x69, 0x6f, 0x6e)
-	o, err = z.PuzzleSolution.MarshalMsg(o)
-	if err != nil {
-		err = msgp.WrapError(err, "PuzzleSolution")
-		return
+	if z.PuzzleSolution == nil {
+		o = msgp.AppendNil(o)
+	} else {
+		// map header, size 2
+		// string "initial_hash"
+		o = append(o, 0x82, 0xac, 0x69, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x5f, 0x68, 0x61, 0x73, 0x68)
+		o, err = msgp.AppendExtension(o, &z.PuzzleSolution.InitialHash)
+		if err != nil {
+			err = msgp.WrapError(err, "PuzzleSolution", "InitialHash")
+			return
+		}
+		// string "last_hash"
+		o = append(o, 0xa9, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x68, 0x61, 0x73, 0x68)
+		o, err = msgp.AppendExtension(o, &z.PuzzleSolution.LastHash)
+		if err != nil {
+			err = msgp.WrapError(err, "PuzzleSolution", "LastHash")
+			return
+		}
 	}
 	return
 }
@@ -494,10 +572,50 @@ func (z *RequestMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				z.Type = RequestType(zb0002)
 			}
 		case "puzzle_solution":
-			bts, err = z.PuzzleSolution.UnmarshalMsg(bts)
-			if err != nil {
-				err = msgp.WrapError(err, "PuzzleSolution")
-				return
+			if msgp.IsNil(bts) {
+				bts, err = msgp.ReadNilBytes(bts)
+				if err != nil {
+					return
+				}
+				z.PuzzleSolution = nil
+			} else {
+				if z.PuzzleSolution == nil {
+					z.PuzzleSolution = new(PuzzleSolution)
+				}
+				var zb0003 uint32
+				zb0003, bts, err = msgp.ReadMapHeaderBytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "PuzzleSolution")
+					return
+				}
+				for zb0003 > 0 {
+					zb0003--
+					field, bts, err = msgp.ReadMapKeyZC(bts)
+					if err != nil {
+						err = msgp.WrapError(err, "PuzzleSolution")
+						return
+					}
+					switch msgp.UnsafeString(field) {
+					case "initial_hash":
+						bts, err = msgp.ReadExtensionBytes(bts, &z.PuzzleSolution.InitialHash)
+						if err != nil {
+							err = msgp.WrapError(err, "PuzzleSolution", "InitialHash")
+							return
+						}
+					case "last_hash":
+						bts, err = msgp.ReadExtensionBytes(bts, &z.PuzzleSolution.LastHash)
+						if err != nil {
+							err = msgp.WrapError(err, "PuzzleSolution", "LastHash")
+							return
+						}
+					default:
+						bts, err = msgp.Skip(bts)
+						if err != nil {
+							err = msgp.WrapError(err, "PuzzleSolution")
+							return
+						}
+					}
+				}
 			}
 		default:
 			bts, err = msgp.Skip(bts)
@@ -513,7 +631,12 @@ func (z *RequestMsg) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *RequestMsg) Msgsize() (s int) {
-	s = 1 + 5 + msgp.ByteSize + 16 + z.PuzzleSolution.Msgsize()
+	s = 1 + 5 + msgp.ByteSize + 16
+	if z.PuzzleSolution == nil {
+		s += msgp.NilSize
+	} else {
+		s += 1 + 13 + msgp.ExtensionPrefixSize + z.PuzzleSolution.InitialHash.Len() + 10 + msgp.ExtensionPrefixSize + z.PuzzleSolution.LastHash.Len()
+	}
 	return
 }
 

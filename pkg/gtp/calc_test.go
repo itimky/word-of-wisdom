@@ -32,11 +32,11 @@ func hexHash(hexStr string) Hash {
 
 type GTPSuite struct {
 	suite.Suite
-	gtp *GTP
+	gtp *Calc
 }
 
 func (s *GTPSuite) SetupSuite() {
-	s.gtp = NewGTP(now)
+	s.gtp = NewCalc(now)
 }
 
 func (s *GTPSuite) TestGTP_CalcInitialHash() {
@@ -115,7 +115,7 @@ func TestGTP_Timestamp(t *testing.T) {
 	}
 	for _, tt := range args {
 		t.Run(tt.name, func(t *testing.T) {
-			gtp := NewGTP(tt.now)
+			gtp := NewCalc(tt.now)
 			assert.Equal(t, tt.result, gtp.timestamp())
 		})
 	}
@@ -129,7 +129,7 @@ func TestGuideIndex(t *testing.T) {
 	args := []struct {
 		hash       Hash
 		guideCount int
-		result     int64
+		result     int
 	}{
 		{
 			hash:       hexHash("0000000000000000000000000000000000000000000000000000000000000000"),
@@ -163,7 +163,7 @@ func BenchmarkGTP_CalcInitialHash(b *testing.B) {
 	clientIP := "127.0.0.1"
 	tourLength := 5
 	secret := "test-secret-key"
-	gtp := NewGTP(time.Now)
+	gtp := NewCalc(time.Now)
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
@@ -177,7 +177,7 @@ func BenchmarkGTP_CalcGuideHash(b *testing.B) {
 	tourNumber := 1
 	tourLength := 5
 	secret := "test-secret-key-2"
-	gtp := NewGTP(time.Now)
+	gtp := NewCalc(time.Now)
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
@@ -192,7 +192,7 @@ func BenchmarkGTP_VerifyHash(b *testing.B) {
 	guideSecrets := []string{"test-guide-secret-key-1", "test-guide-secret-key-2"}
 	initialHash := hexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	lastHash := hexHash("4DDD8EB388374180706E41B24A19AA29B5E58A7281E6CBEEA4C8BD223D3A4B67")
-	gtp := NewGTP(time.Now)
+	gtp := NewCalc(time.Now)
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {

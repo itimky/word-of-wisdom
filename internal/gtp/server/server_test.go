@@ -1,23 +1,25 @@
-package shield
+package server
 
 import (
 	"testing"
 
-	"github.com/itimky/word-of-wisom/internal/service/shield/mocks"
+	"github.com/itimky/word-of-wisom/pkg/gtp"
+
+	"github.com/itimky/word-of-wisom/internal/gtp/server/mocks"
 	"github.com/itimky/word-of-wisom/pkg/testutils"
 	"github.com/stretchr/testify/suite"
 )
 
 type ServiceSuite struct {
 	suite.Suite
-	service      *Service
+	service      *Server
 	hashCalcMock *mocks.HashCalc
 	clientIP     string
 }
 
 func (s *ServiceSuite) SetupSuite() {
 	// Init hashCalc in SetupTest
-	s.service = &Service{}
+	s.service = &Server{}
 	s.clientIP = "127.0.0.1"
 }
 
@@ -43,7 +45,7 @@ func (s *ServiceSuite) TestService_Check__Ok() {
 	s.hashCalcMock.EXPECT().VerifyHash(hash, hash, s.service.cfg.TourLength, s.clientIP,
 		s.service.secret, s.service.cfg.GuideSecrets).Return(true)
 
-	result := s.service.CheckPuzzle(s.clientIP, &PuzzleSolution{InitialHash: hash, LastHash: hash})
+	result := s.service.CheckPuzzle(s.clientIP, &gtp.PuzzleSolution{InitialHash: hash, LastHash: hash})
 	s.Equal(Ok, result.Type)
 	s.Nil(result.Puzzle)
 }
@@ -54,7 +56,7 @@ func (s *ServiceSuite) TestService_Check__WrongSolution() {
 	s.hashCalcMock.EXPECT().VerifyHash(hash, hash, s.service.cfg.TourLength, s.clientIP,
 		s.service.secret, s.service.cfg.GuideSecrets).Return(false)
 
-	result := s.service.CheckPuzzle(s.clientIP, &PuzzleSolution{InitialHash: hash, LastHash: hash})
+	result := s.service.CheckPuzzle(s.clientIP, &gtp.PuzzleSolution{InitialHash: hash, LastHash: hash})
 	s.Equal(WrongSolution, result.Type)
 	s.Nil(result.Puzzle)
 }

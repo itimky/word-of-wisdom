@@ -14,8 +14,8 @@ const (
 )
 
 type RequestMsg struct {
-	Type           RequestType `msg:"type"`
-	PuzzleSolution msgp.Raw    `msg:"puzzle_solution"` // nil, PuzzleSolution
+	Type           RequestType     `msg:"type"`
+	PuzzleSolution *PuzzleSolution `msg:"puzzle_solution"` // nil, PuzzleSolution
 }
 
 type PuzzleSolution struct {

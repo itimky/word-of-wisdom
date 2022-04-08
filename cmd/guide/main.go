@@ -26,7 +26,7 @@ func main() {
 		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
 		conf.Multicore,
 		conf.Secret,
-		gtp.NewGTP(time.Now),
+		gtp.NewCalc(time.Now),
 	)
 	if err = g.Run(); err != nil {
 		logrus.WithError(err).Fatal("guide run")

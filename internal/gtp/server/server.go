@@ -1,29 +1,31 @@
-package shield
+package server
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/itimky/word-of-wisom/pkg/gtp"
+
 	"github.com/sirupsen/logrus"
 )
 
-type Service struct {
+type Server struct {
 	cfg      Config
 	secret   string
 	hashCalc hashCalc
 }
 
-func NewService(
+func NewServer(
 	cfg Config,
 	hashCalc hashCalc,
-) *Service {
-	return &Service{
+) *Server {
+	return &Server{
 		cfg:      cfg,
 		hashCalc: hashCalc,
 	}
 }
 
-func (s *Service) Init() error {
+func (s *Server) Init() error {
 	if err := s.updateSecret(); err != nil {
 		return fmt.Errorf("update secret: %w", err)
 	}
@@ -41,7 +43,7 @@ func (s *Service) Init() error {
 	return nil
 }
 
-func (s *Service) updateSecret() error {
+func (s *Server) updateSecret() error {
 	secret, err := randomSecret(s.cfg.SecretLength)
 	if err != nil {
 		return fmt.Errorf("update secret: %w", err)
@@ -50,12 +52,12 @@ func (s *Service) updateSecret() error {
 	return nil
 }
 
-func (s *Service) CheckPuzzle(clientIP string, solution *PuzzleSolution) PuzzleCheckResult {
+func (s *Server) CheckPuzzle(clientIP string, solution *gtp.PuzzleSolution) PuzzleCheckResult {
 	var result PuzzleCheckResult
 	if solution == nil {
 		result.Type = Restricted
 		initialHash := s.hashCalc.CalcInitialHash(clientIP, s.cfg.TourLength, s.secret)
-		result.Puzzle = &Puzzle{InitialHash: initialHash, TourLength: s.cfg.TourLength}
+		result.Puzzle = &gtp.Puzzle{InitialHash: initialHash, TourLength: s.cfg.TourLength}
 	} else {
 		if s.hashCalc.VerifyHash(solution.InitialHash, solution.LastHash, s.cfg.TourLength, clientIP, s.secret, s.cfg.GuideSecrets) {
 			result.Type = Ok

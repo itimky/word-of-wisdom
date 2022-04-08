@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/itimky/word-of-wisom/internal/gtp/server"
+
 	srvapi "github.com/itimky/word-of-wisom/api/server"
-	"github.com/itimky/word-of-wisom/internal/service/shield"
 	"github.com/itimky/word-of-wisom/internal/tcp"
 	"github.com/panjf2000/gnet/v2"
 	"github.com/sirupsen/logrus"
@@ -18,16 +19,16 @@ type Server struct {
 	addr      string
 	multicore bool
 
-	shield       shieldService
-	quoteService quoteService
+	gtpServer       gtpServer
+	quoteRepository quoteRepository
 }
 
-func NewServer(addr string, multicore bool, serviceSvc shieldService, quoteSvc quoteService) *Server {
+func NewServer(addr string, multicore bool, gtpServer gtpServer, quoteSvc quoteRepository) *Server {
 	return &Server{
-		addr:         addr,
-		multicore:    multicore,
-		shield:       serviceSvc,
-		quoteService: quoteSvc,
+		addr:            addr,
+		multicore:       multicore,
+		gtpServer:       gtpServer,
+		quoteRepository: quoteSvc,
 	}
 }
 
@@ -90,7 +91,7 @@ func (s *Server) handleRequest(clientIP string, requestMsg srvapi.RequestMsg) (*
 
 	switch requestMsg.Type {
 	case srvapi.Quote:
-		quote := s.quoteService.Get()
+		quote := s.quoteRepository.Get()
 		responseMsg, err := newQuoteResponse(quote)
 		if err != nil {
 			return responseMsg, fmt.Errorf("new quote response")
@@ -104,13 +105,10 @@ func (s *Server) handleRequest(clientIP string, requestMsg srvapi.RequestMsg) (*
 }
 
 func (s *Server) checkPuzzle(clientIP string, requestMsg srvapi.RequestMsg) (*srvapi.ResponseMsg, error) {
-	puzzleSolution, err := convertPuzzleSolution(requestMsg.PuzzleSolution)
-	if err != nil {
-		return nil, fmt.Errorf("convert puzzle solution: %w", err)
-	}
+	puzzleSolution := convertPuzzleSolution(requestMsg.PuzzleSolution)
 
-	checkResult := s.shield.CheckPuzzle(clientIP, puzzleSolution)
-	if checkResult.Type != shield.Ok {
+	checkResult := s.gtpServer.CheckPuzzle(clientIP, puzzleSolution)
+	if checkResult.Type != server.Ok {
 		restrictedResponse, err := newRestrictedResponse(checkResult)
 		if err != nil {
 			return nil, fmt.Errorf("new restricted response")

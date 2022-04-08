@@ -15,7 +15,7 @@ func init() {
 
 type Hash gtp.Hash
 
-func (h *Hash) String() string {
+func (h Hash) String() string {
 	return fmt.Sprintf("%X", h[:])
 }
 

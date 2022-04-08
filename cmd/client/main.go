@@ -3,11 +3,13 @@ package main
 import (
 	"time"
 
-	"github.com/itimky/word-of-wisom/pkg/utils"
-
-	"github.com/itimky/word-of-wisom/internal/tcp/client"
+	client "github.com/itimky/word-of-wisom/internal/client"
 
 	"github.com/sirupsen/logrus"
+
+	gtpclient "github.com/itimky/word-of-wisom/internal/gtp/client"
+	tcpclient "github.com/itimky/word-of-wisom/internal/tcp/client"
+	"github.com/itimky/word-of-wisom/pkg/utils"
 )
 
 func main() {
@@ -22,16 +24,18 @@ func main() {
 
 	logrus.Debugf("%+v", conf)
 
-	cl := client.NewClient(conf.Server, conf.Guides)
+	tcpClient := tcpclient.NewClient(conf.Server, conf.Guides)
+	gtpClient := gtpclient.NewClient(tcpClient, len(conf.Guides), conf.RetryCount)
+	c := client.NewClient(gtpClient)
 
 	ticker := time.NewTicker(conf.RequestInterval)
 	for range ticker.C {
-		quote, err := cl.RequestQuote(conf.RetryCount)
+		response, err := c.RequestQuote()
 		if err != nil {
 			logrus.WithError(err).Error("request quote")
 			continue
 		}
 
-		logrus.Infof("Quote: %v\n\n", quote)
+		logrus.Infof("Quote: %v\n\n", response.Quote)
 	}
 }

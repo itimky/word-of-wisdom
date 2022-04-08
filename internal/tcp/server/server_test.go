@@ -3,9 +3,11 @@ package server
 import (
 	"testing"
 
+	"github.com/itimky/word-of-wisom/pkg/gtp"
+
 	"github.com/itimky/word-of-wisom/api"
 	srvapi "github.com/itimky/word-of-wisom/api/server"
-	"github.com/itimky/word-of-wisom/internal/service/shield"
+	"github.com/itimky/word-of-wisom/internal/gtp/server"
 	"github.com/itimky/word-of-wisom/internal/tcp/server/mocks"
 	"github.com/itimky/word-of-wisom/pkg/testutils"
 	"github.com/stretchr/testify/suite"
@@ -29,8 +31,8 @@ func (s *ServerSuite) SetupSuite() {
 func (s *ServerSuite) SetupTest() {
 	s.shieldMock = &mocks.ShieldService{}
 	s.quoteServiceMock = &mocks.QuoteService{}
-	s.srv.shield = s.shieldMock
-	s.srv.quoteService = s.quoteServiceMock
+	s.srv.gtpServer = s.shieldMock
+	s.srv.quoteRepository = s.quoteServiceMock
 }
 
 func (s *ServerSuite) TestServer_handleRequest__Restricted() {
@@ -38,9 +40,9 @@ func (s *ServerSuite) TestServer_handleRequest__Restricted() {
 
 	hash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	tourLength := 7
-	checkResult := shield.PuzzleCheckResult{
-		Type: shield.Restricted,
-		Puzzle: &shield.Puzzle{
+	checkResult := server.PuzzleCheckResult{
+		Type: server.Restricted,
+		Puzzle: &gtp.Puzzle{
 			InitialHash: hash,
 			TourLength:  tourLength,
 		},
@@ -53,7 +55,7 @@ func (s *ServerSuite) TestServer_handleRequest__Restricted() {
 	rawPayload, err := payload.MarshalMsg(nil)
 	s.NoError(err)
 
-	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*shield.PuzzleSolution)(nil)).Return(checkResult)
+	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*gtp.PuzzleSolution)(nil)).Return(checkResult)
 
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
@@ -64,20 +66,19 @@ func (s *ServerSuite) TestServer_handleRequest__Restricted() {
 func (s *ServerSuite) TestWrongSolution() {
 	initialHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	latHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E5")
-	puzzleSolution := shield.PuzzleSolution{
+	puzzleSolution := gtp.PuzzleSolution{
 		InitialHash: initialHash,
 		LastHash:    latHash,
 	}
-	checkResult := shield.PuzzleCheckResult{
-		Type: shield.WrongSolution,
+	checkResult := server.PuzzleCheckResult{
+		Type: server.WrongSolution,
 	}
-	solutionPayload := srvapi.PuzzleSolution{
+	apiPuzzleSolution := &srvapi.PuzzleSolution{
 		InitialHash: api.Hash(initialHash),
 		LastHash:    api.Hash(latHash),
 	}
-	rawPayload, err := solutionPayload.MarshalMsg(nil)
-	s.NoError(err)
-	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: rawPayload}
+
+	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: apiPuzzleSolution}
 
 	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, &puzzleSolution).Return(checkResult)
 
@@ -91,20 +92,18 @@ func (s *ServerSuite) TestGranted() {
 	initialHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	latHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E5")
 	quote := "Some quote"
-	puzzleSolution := &shield.PuzzleSolution{
+	puzzleSolution := &gtp.PuzzleSolution{
 		InitialHash: initialHash,
 		LastHash:    latHash,
 	}
-	checkResult := shield.PuzzleCheckResult{
-		Type: shield.Ok,
+	checkResult := server.PuzzleCheckResult{
+		Type: server.Ok,
 	}
-	payload := srvapi.PuzzleSolution{
+	apiPuzzleSolution := &srvapi.PuzzleSolution{
 		InitialHash: api.Hash(initialHash),
 		LastHash:    api.Hash(latHash),
 	}
-	rawPayload, err := payload.MarshalMsg(nil)
-	s.NoError(err)
-	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: rawPayload}
+	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: apiPuzzleSolution}
 
 	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, puzzleSolution).Return(checkResult)
 	s.quoteServiceMock.EXPECT().Get().Return(quote)
@@ -121,10 +120,10 @@ func (s *ServerSuite) TestGranted() {
 
 func (s *ServerSuite) TestUnsupported() {
 	request := srvapi.RequestMsg{Type: srvapi.RequestType(10)}
-	checkResult := shield.PuzzleCheckResult{
-		Type: shield.Ok,
+	checkResult := server.PuzzleCheckResult{
+		Type: server.Ok,
 	}
-	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*shield.PuzzleSolution)(nil)).Return(checkResult)
+	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*gtp.PuzzleSolution)(nil)).Return(checkResult)
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
 	s.Equal(srvapi.Unsupported, response.Type)

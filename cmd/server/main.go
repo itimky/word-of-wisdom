@@ -5,11 +5,12 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/itimky/word-of-wisom/internal/repository/quote"
+
 	"github.com/itimky/word-of-wisom/pkg/utils"
 
-	"github.com/itimky/word-of-wisom/internal/service/quote"
-	"github.com/itimky/word-of-wisom/internal/service/shield"
-	"github.com/itimky/word-of-wisom/internal/tcp/server"
+	gtpserver "github.com/itimky/word-of-wisom/internal/gtp/server"
+	tcpserver "github.com/itimky/word-of-wisom/internal/tcp/server"
 
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/sirupsen/logrus"
@@ -25,14 +26,14 @@ func main() {
 
 	logrus.Debugf("%+v", conf)
 
-	hashCalc := gtp.NewGTP(time.Now)
+	hashCalc := gtp.NewCalc(time.Now)
 
 	//nolint:gosec
 	// Just random item, no security
-	quoteSvc := quote.NewService(rand.New(rand.NewSource(time.Now().Unix())))
+	quoteSvc := quote.NewRepository(rand.New(rand.NewSource(time.Now().Unix())))
 
-	shieldSvc := shield.NewService(
-		shield.Config{
+	shieldSvc := gtpserver.NewServer(
+		gtpserver.Config{
 			TourLength:           conf.TourLength,
 			SecretLength:         conf.SecretLength,
 			SecretUpdateInterval: conf.SecretUpdateInterval,
@@ -44,7 +45,7 @@ func main() {
 		logrus.WithError(err).Fatal("shield service init")
 	}
 
-	srv := server.NewServer(
+	srv := tcpserver.NewServer(
 		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
 		conf.Multicore,
 		shieldSvc,

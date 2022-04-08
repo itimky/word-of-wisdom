@@ -2,13 +2,13 @@ package quote
 
 import "math/rand"
 
-type Service struct {
+type Repository struct {
 	rnd    *rand.Rand
 	quotes []string
 }
 
-func NewService(rnd *rand.Rand) *Service {
-	return &Service{
+func NewRepository(rnd *rand.Rand) *Repository {
+	return &Repository{
 		rnd: rnd,
 		quotes: []string{
 			"The best way out is always through",
@@ -25,6 +25,6 @@ func NewService(rnd *rand.Rand) *Service {
 	}
 }
 
-func (qr *Service) Get() string {
+func (qr *Repository) Get() string {
 	return qr.quotes[qr.rnd.Intn(len(qr.quotes))]
 }

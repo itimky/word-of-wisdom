@@ -26,6 +26,7 @@ services:
       WOW_HOST: "server"
       WOW_PORT: "29170"
       WOW_MULTICORE: "true"
+      WOW_TIMEOUT: 5s
       WOW_GUIDE_SECRETS: "some-secret-for-guide-1,some-secret-for-guide-2"
       WOW_SECRET_LENGTH: 20
       WOW_SECRET_UPDATE_INTERVAL: 10s
@@ -42,6 +43,7 @@ services:
       WOW_HOST: "guide1"
       WOW_PORT: "29171"
       WOW_MULTICORE: "true"
+      WOW_TIMEOUT: 5s
       WOW_SECRET: "some-secret-for-guide-1"
       WOW_DEBUG: "true"
 
@@ -55,5 +57,6 @@ services:
       WOW_HOST: "guide2"
       WOW_PORT: "29172"
       WOW_MULTICORE: "true"
+      WOW_TIMEOUT: 5s
       WOW_SECRET: "some-secret-for-guide-2"
       WOW_DEBUG: "true"

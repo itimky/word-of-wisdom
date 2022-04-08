@@ -2,7 +2,9 @@ package guide
 
 import (
 	"fmt"
-	"log"
+	"time"
+
+	"github.com/panjf2000/gnet/v2/pkg/pool/goroutine"
 
 	"github.com/panjf2000/gnet/v2"
 	"github.com/sirupsen/logrus"
@@ -16,27 +18,36 @@ import (
 
 type Guide struct {
 	gnet.BuiltinEventEngine
-	//pool *goroutine.Pool
-	//eng  gnet.Engine
+	pool *goroutine.Pool
 
 	addr      string
 	multicore bool
+	timeout   time.Duration
 
 	secret   string
 	hashCalc hashCalc
 }
 
-func NewGuide(addr string, multicore bool, secret string, hashCalc hashCalc) *Guide {
+func NewGuide(
+	pool *goroutine.Pool,
+	addr string,
+	multicore bool,
+	timeout time.Duration,
+	secret string,
+	hashCalc hashCalc,
+) *Guide {
 	return &Guide{
+		pool:      pool,
 		addr:      addr,
 		multicore: multicore,
+		timeout:   timeout,
 		secret:    secret,
 		hashCalc:  hashCalc,
 	}
 }
 
 func (g *Guide) Run() error {
-	err := gnet.Run(g, g.addr, gnet.WithMulticore(g.multicore))
+	err := gnet.Run(g, g.addr, gnet.WithOptions(gnet.Options{Multicore: g.multicore, TCPKeepAlive: g.timeout}))
 	if err != nil {
 		return fmt.Errorf("gnet run: %w", err)
 	}
@@ -44,13 +55,22 @@ func (g *Guide) Run() error {
 }
 
 func (g *Guide) OnBoot(eng gnet.Engine) gnet.Action {
-	log.Printf("server with multi-core=%t is listening on %s\n", g.multicore, g.addr)
+	logrus.Infof("server (multi-core=%t timeout=%v) is listening on %s\n", g.multicore, g.timeout, g.addr)
 	return gnet.None
 }
 
 func (g *Guide) OnTraffic(conn gnet.Conn) gnet.Action {
-	if err := g.handleConnection(conn); err != nil {
-		logrus.WithError(err).Error("handle connection")
+	err := g.pool.Submit(func() {
+		if err := g.handleConnection(conn); err != nil {
+			logrus.WithError(err).Error("handle connection")
+		}
+		if err := conn.Close(nil); err != nil {
+			logrus.WithError(err).Error("close connection")
+		}
+	})
+
+	if err != nil {
+		logrus.WithError(err).Error("submit")
 		return gnet.Close
 	}
 

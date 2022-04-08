@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/panjf2000/gnet/v2/pkg/pool/goroutine"
+
 	"github.com/itimky/word-of-wisom/pkg/utils"
 
 	"github.com/itimky/word-of-wisom/internal/tcp/guide"
@@ -23,9 +25,14 @@ func main() {
 
 	logrus.Debugf("%+v", conf)
 
+	pool := goroutine.Default()
+	defer pool.Release()
+
 	g := guide.NewGuide(
+		pool,
 		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
 		conf.Multicore,
+		conf.Timeout,
 		conf.Secret,
 		gtp.NewCalc(time.Now),
 	)

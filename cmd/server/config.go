@@ -8,9 +8,10 @@ import (
 )
 
 type config struct {
-	Host      string `envconfig:"HOST"`
-	Port      string `envconfig:"PORT"`
-	Multicore bool   `envconfig:"MULTICORE"`
+	Host      string        `envconfig:"HOST"`
+	Port      string        `envconfig:"PORT"`
+	Multicore bool          `envconfig:"MULTICORE"`
+	Timeout   time.Duration `envconfig:"TIMEOUT"`
 
 	SecretLength         int           `envconfig:"SECRET_LENGTH"`
 	SecretUpdateInterval time.Duration `envconfig:"SECRET_UPDATE_INTERVAL"`

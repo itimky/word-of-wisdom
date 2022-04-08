@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 )
 
 type config struct {
-	Host      string `envconfig:"HOST"`
-	Port      string `envconfig:"PORT"`
-	Multicore bool   `envconfig:"MULTICORE"`
+	Host      string        `envconfig:"HOST"`
+	Port      string        `envconfig:"PORT"`
+	Multicore bool          `envconfig:"MULTICORE"`
+	Timeout   time.Duration `envconfig:"TIMEOUT"`
 
 	Secret string `envconfig:"SECRET"`
 

@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/panjf2000/gnet/v2/pkg/pool/goroutine"
+
 	"github.com/itimky/word-of-wisom/internal/repository/quote"
 
 	"github.com/itimky/word-of-wisom/pkg/utils"
@@ -31,9 +33,9 @@ func main() {
 
 	//nolint:gosec
 	// Just random item, no security
-	quoteSvc := quote.NewRepository(rand.New(rand.NewSource(time.Now().Unix())))
+	quoteRepo := quote.NewRepository(rand.New(rand.NewSource(time.Now().Unix())))
 
-	shieldSvc := gtpserver.NewServer(
+	gtpServer := gtpserver.NewServer(
 		gtpserver.Config{
 			TourLength:           conf.TourLength,
 			SecretLength:         conf.SecretLength,
@@ -42,15 +44,20 @@ func main() {
 		},
 		hashCalc,
 	)
-	if err = shieldSvc.Init(); err != nil {
+	if err = gtpServer.Init(); err != nil {
 		logrus.WithError(err).Fatal("shield service init")
 	}
 
+	pool := goroutine.Default()
+	defer pool.Release()
+
 	srv := tcpserver.NewServer(
+		pool,
 		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
 		conf.Multicore,
-		shieldSvc,
-		quoteSvc,
+		conf.Timeout,
+		gtpServer,
+		quoteRepo,
 	)
 	if err = srv.Run(); err != nil {
 		logrus.WithError(err).Fatal("server run")

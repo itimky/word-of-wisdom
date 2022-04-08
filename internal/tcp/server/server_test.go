@@ -17,23 +17,23 @@ import (
 
 type ServerSuite struct {
 	suite.Suite
-	shieldMock       *mocks.ShieldService
-	quoteServiceMock *mocks.QuoteService
-	srv              *Server
-	clientIP         string
+	gtpSrvMock    *mocks.GtpServer
+	quoteRepoMock *mocks.QuoteRepository
+	srv           *Server
+	clientIP      string
 }
 
 func (s *ServerSuite) SetupSuite() {
-	// Init shieldMock & quoteServiceMock in SetupTest
+	// Init gtpSrvMock & quoteRepoMock in SetupTest
 	s.srv = &Server{}
 	s.clientIP = "127.0.0.1"
 }
 
 func (s *ServerSuite) SetupTest() {
-	s.shieldMock = &mocks.ShieldService{}
-	s.quoteServiceMock = &mocks.QuoteService{}
-	s.srv.gtpServer = s.shieldMock
-	s.srv.quoteRepository = s.quoteServiceMock
+	s.gtpSrvMock = &mocks.GtpServer{}
+	s.quoteRepoMock = &mocks.QuoteRepository{}
+	s.srv.gtpServer = s.gtpSrvMock
+	s.srv.quoteRepository = s.quoteRepoMock
 }
 
 func (s *ServerSuite) TestServer_handleRequest__Restricted() {
@@ -56,7 +56,7 @@ func (s *ServerSuite) TestServer_handleRequest__Restricted() {
 	rawPayload, err := payload.MarshalMsg(nil)
 	s.NoError(err)
 
-	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*gtp.PuzzleSolution)(nil)).Return(checkResult)
+	s.gtpSrvMock.EXPECT().CheckPuzzle(s.clientIP, (*gtp.PuzzleSolution)(nil)).Return(checkResult)
 
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
@@ -81,7 +81,7 @@ func (s *ServerSuite) TestWrongSolution() {
 
 	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: apiPuzzleSolution}
 
-	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, &puzzleSolution).Return(checkResult)
+	s.gtpSrvMock.EXPECT().CheckPuzzle(s.clientIP, &puzzleSolution).Return(checkResult)
 
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
@@ -106,8 +106,8 @@ func (s *ServerSuite) TestGranted() {
 	}
 	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: apiPuzzleSolution}
 
-	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, puzzleSolution).Return(checkResult)
-	s.quoteServiceMock.EXPECT().Get().Return(quote)
+	s.gtpSrvMock.EXPECT().CheckPuzzle(s.clientIP, puzzleSolution).Return(checkResult)
+	s.quoteRepoMock.EXPECT().Get().Return(quote)
 
 	responsePayload := srvapi.QuoteResponse{Quote: quote}
 	rawResponsePayload, err := responsePayload.MarshalMsg(nil)
@@ -124,7 +124,7 @@ func (s *ServerSuite) TestUnsupported() {
 	checkResult := server.PuzzleCheckResult{
 		Type: server.Ok,
 	}
-	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*gtp.PuzzleSolution)(nil)).Return(checkResult)
+	s.gtpSrvMock.EXPECT().CheckPuzzle(s.clientIP, (*gtp.PuzzleSolution)(nil)).Return(checkResult)
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
 	s.Equal(srvapi.Unsupported, response.Type)

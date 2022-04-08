@@ -3,9 +3,8 @@
 package mocks
 
 import (
-	mock "github.com/stretchr/testify/mock"
-
 	guide "github.com/itimky/word-of-wisom/api/guide"
+	mock "github.com/stretchr/testify/mock"
 
 	server "github.com/itimky/word-of-wisom/api/server"
 )
@@ -23,13 +22,13 @@ func (_m *TcpClient) EXPECT() *TcpClient_Expecter {
 	return &TcpClient_Expecter{mock: &_m.Mock}
 }
 
-// RequestGuideByIdx provides a mock function with given fields: idx, _a1
-func (_m *TcpClient) RequestGuideByIdx(idx int, _a1 guide.RequestMsg) (*guide.ResponseMsg, error) {
-	ret := _m.Called(idx, _a1)
+// RequestGuideByIdx provides a mock function with given fields: idx, request
+func (_m *TcpClient) RequestGuideByIdx(idx int, request guide.RequestMsg) (*guide.ResponseMsg, error) {
+	ret := _m.Called(idx, request)
 
 	var r0 *guide.ResponseMsg
 	if rf, ok := ret.Get(0).(func(int, guide.RequestMsg) *guide.ResponseMsg); ok {
-		r0 = rf(idx, _a1)
+		r0 = rf(idx, request)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*guide.ResponseMsg)
@@ -38,7 +37,7 @@ func (_m *TcpClient) RequestGuideByIdx(idx int, _a1 guide.RequestMsg) (*guide.Re
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(int, guide.RequestMsg) error); ok {
-		r1 = rf(idx, _a1)
+		r1 = rf(idx, request)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -53,12 +52,12 @@ type TcpClient_RequestGuideByIdx_Call struct {
 
 // RequestGuideByIdx is a helper method to define mock.On call
 //  - idx int
-//  - _a1 guide.RequestMsg
-func (_e *TcpClient_Expecter) RequestGuideByIdx(idx interface{}, _a1 interface{}) *TcpClient_RequestGuideByIdx_Call {
-	return &TcpClient_RequestGuideByIdx_Call{Call: _e.mock.On("RequestGuideByIdx", idx, _a1)}
+//  - request guide.RequestMsg
+func (_e *TcpClient_Expecter) RequestGuideByIdx(idx interface{}, request interface{}) *TcpClient_RequestGuideByIdx_Call {
+	return &TcpClient_RequestGuideByIdx_Call{Call: _e.mock.On("RequestGuideByIdx", idx, request)}
 }
 
-func (_c *TcpClient_RequestGuideByIdx_Call) Run(run func(idx int, _a1 guide.RequestMsg)) *TcpClient_RequestGuideByIdx_Call {
+func (_c *TcpClient_RequestGuideByIdx_Call) Run(run func(idx int, request guide.RequestMsg)) *TcpClient_RequestGuideByIdx_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(int), args[1].(guide.RequestMsg))
 	})
@@ -70,13 +69,13 @@ func (_c *TcpClient_RequestGuideByIdx_Call) Return(_a0 *guide.ResponseMsg, _a1 e
 	return _c
 }
 
-// RequestServer provides a mock function with given fields: _a0
-func (_m *TcpClient) RequestServer(_a0 server.RequestMsg) (*server.ResponseMsg, error) {
-	ret := _m.Called(_a0)
+// RequestServer provides a mock function with given fields: request
+func (_m *TcpClient) RequestServer(request server.RequestMsg) (*server.ResponseMsg, error) {
+	ret := _m.Called(request)
 
 	var r0 *server.ResponseMsg
 	if rf, ok := ret.Get(0).(func(server.RequestMsg) *server.ResponseMsg); ok {
-		r0 = rf(_a0)
+		r0 = rf(request)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*server.ResponseMsg)
@@ -85,7 +84,7 @@ func (_m *TcpClient) RequestServer(_a0 server.RequestMsg) (*server.ResponseMsg, 
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(server.RequestMsg) error); ok {
-		r1 = rf(_a0)
+		r1 = rf(request)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -99,12 +98,12 @@ type TcpClient_RequestServer_Call struct {
 }
 
 // RequestServer is a helper method to define mock.On call
-//  - _a0 server.RequestMsg
-func (_e *TcpClient_Expecter) RequestServer(_a0 interface{}) *TcpClient_RequestServer_Call {
-	return &TcpClient_RequestServer_Call{Call: _e.mock.On("RequestServer", _a0)}
+//  - request server.RequestMsg
+func (_e *TcpClient_Expecter) RequestServer(request interface{}) *TcpClient_RequestServer_Call {
+	return &TcpClient_RequestServer_Call{Call: _e.mock.On("RequestServer", request)}
 }
 
-func (_c *TcpClient_RequestServer_Call) Run(run func(_a0 server.RequestMsg)) *TcpClient_RequestServer_Call {
+func (_c *TcpClient_RequestServer_Call) Run(run func(request server.RequestMsg)) *TcpClient_RequestServer_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(server.RequestMsg))
 	})

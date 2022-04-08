@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/itimky/word-of-wisom/api"
 	"github.com/tinylib/msgp/msgp"
+
+	"github.com/itimky/word-of-wisom/api"
 )
 
 //go:generate msgp

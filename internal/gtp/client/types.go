@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/tinylib/msgp/msgp"
+
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
 type serverResponse struct {

@@ -1,8 +1,9 @@
 package client
 
 import (
-	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/tinylib/msgp/msgp"
+
+	srvapi "github.com/itimky/word-of-wisom/api/server"
 )
 
 //go:generate mockery --all --exported=true --with-expecter=true

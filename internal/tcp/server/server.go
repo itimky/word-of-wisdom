@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/itimky/word-of-wisom/internal/gtp/server"
-
-	srvapi "github.com/itimky/word-of-wisom/api/server"
-	"github.com/itimky/word-of-wisom/internal/tcp"
 	"github.com/panjf2000/gnet/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
+
+	srvapi "github.com/itimky/word-of-wisom/api/server"
+	gtpserver "github.com/itimky/word-of-wisom/internal/gtp/server"
+	"github.com/itimky/word-of-wisom/internal/tcp"
 )
 
 type Server struct {
@@ -108,7 +108,7 @@ func (s *Server) checkPuzzle(clientIP string, requestMsg srvapi.RequestMsg) (*sr
 	puzzleSolution := convertPuzzleSolution(requestMsg.PuzzleSolution)
 
 	checkResult := s.gtpServer.CheckPuzzle(clientIP, puzzleSolution)
-	if checkResult.Type != server.Ok {
+	if checkResult.Type != gtpserver.Ok {
 		restrictedResponse, err := newRestrictedResponse(checkResult)
 		if err != nil {
 			return nil, fmt.Errorf("new restricted response")

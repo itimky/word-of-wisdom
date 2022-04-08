@@ -3,9 +3,10 @@ package client
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/itimky/word-of-wisom/internal/client/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_RequestQuote(t *testing.T) {

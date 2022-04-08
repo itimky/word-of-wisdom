@@ -8,8 +8,9 @@ import (
 
 	"github.com/itimky/word-of-wisom/internal/tcp/guide"
 
-	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/sirupsen/logrus"
+
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
 func main() {

@@ -5,13 +5,14 @@ import (
 
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 
+	"github.com/stretchr/testify/suite"
+	"github.com/tinylib/msgp/msgp"
+
 	"github.com/itimky/word-of-wisom/api"
 	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/itimky/word-of-wisom/internal/gtp/server"
 	"github.com/itimky/word-of-wisom/internal/tcp/server/mocks"
 	"github.com/itimky/word-of-wisom/pkg/testutils"
-	"github.com/stretchr/testify/suite"
-	"github.com/tinylib/msgp/msgp"
 )
 
 type ServerSuite struct {

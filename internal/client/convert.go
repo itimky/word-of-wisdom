@@ -3,8 +3,9 @@ package client
 import (
 	"fmt"
 
-	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/tinylib/msgp/msgp"
+
+	srvapi "github.com/itimky/word-of-wisom/api/server"
 )
 
 func convertPayloadToQuoteResponse(payload msgp.Raw) (*QuoteResponse, error) {

@@ -12,8 +12,9 @@ import (
 	gtpserver "github.com/itimky/word-of-wisom/internal/gtp/server"
 	tcpserver "github.com/itimky/word-of-wisom/internal/tcp/server"
 
-	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/sirupsen/logrus"
+
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
 func main() {

@@ -3,8 +3,9 @@
 package mocks
 
 import (
-	gtp "github.com/itimky/word-of-wisom/pkg/gtp"
 	mock "github.com/stretchr/testify/mock"
+
+	gtp "github.com/itimky/word-of-wisom/pkg/gtp"
 
 	shield "github.com/itimky/word-of-wisom/internal/gtp/server"
 )

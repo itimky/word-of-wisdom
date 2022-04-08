@@ -3,14 +3,15 @@ package client
 import (
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+	"github.com/tinylib/msgp/msgp"
+
 	"github.com/itimky/word-of-wisom/api"
 	guideapi "github.com/itimky/word-of-wisom/api/guide"
 	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/itimky/word-of-wisom/internal/gtp/client/mocks"
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/itimky/word-of-wisom/pkg/testutils"
-	"github.com/stretchr/testify/suite"
-	"github.com/tinylib/msgp/msgp"
 )
 
 type ServiceSuite struct {
@@ -145,6 +146,24 @@ func (s *ServiceSuite) TestService_makeRequest___Granted_Granted() {
 	s.Nil(response.Puzzle)
 	s.NotNil(response.Payload)
 	s.Equal(msgp.Raw(payloadRaw), response.Payload)
+}
+
+func (s *ServiceSuite) TestService_MakeRequest() {
+	quote := "some quote"
+	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: nil}
+	responsePayload := srvapi.QuoteResponse{Quote: quote}
+	rawPayload, err := responsePayload.MarshalMsg(nil)
+	s.NoError(err)
+	responseMsg := &srvapi.ResponseMsg{
+		Type:    srvapi.Granted,
+		Payload: rawPayload,
+	}
+
+	s.tcpClientMock.EXPECT().RequestServer(request).Return(responseMsg, nil)
+
+	response, err := s.svc.MakeRequest(request.Type)
+	s.NoError(err)
+	s.Equal(msgp.Raw(rawPayload), response)
 }
 
 func TestServiceSuite(t *testing.T) {

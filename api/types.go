@@ -3,8 +3,9 @@ package api
 import (
 	"fmt"
 
-	"github.com/itimky/word-of-wisom/pkg/gtp"
 	"github.com/tinylib/msgp/msgp"
+
+	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
 const HashType int8 = 99

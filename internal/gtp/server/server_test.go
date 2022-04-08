@@ -5,9 +5,10 @@ import (
 
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/itimky/word-of-wisom/internal/gtp/server/mocks"
 	"github.com/itimky/word-of-wisom/pkg/testutils"
-	"github.com/stretchr/testify/suite"
 )
 
 type ServiceSuite struct {

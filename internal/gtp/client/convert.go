@@ -4,10 +4,11 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/tinylib/msgp/msgp"
+
 	"github.com/itimky/word-of-wisom/api"
 	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/itimky/word-of-wisom/pkg/gtp"
-	"github.com/tinylib/msgp/msgp"
 )
 
 var errUnexpectedResponse = errors.New("unexpected response")

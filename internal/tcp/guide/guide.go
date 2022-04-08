@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/panjf2000/gnet/v2"
+	"github.com/sirupsen/logrus"
+	"github.com/tinylib/msgp/msgp"
+
 	"github.com/itimky/word-of-wisom/api"
 	guideapi "github.com/itimky/word-of-wisom/api/guide"
 	"github.com/itimky/word-of-wisom/internal/tcp"
 	"github.com/itimky/word-of-wisom/pkg/gtp"
-	"github.com/panjf2000/gnet/v2"
-	"github.com/sirupsen/logrus"
-	"github.com/tinylib/msgp/msgp"
 )
 
 type Guide struct {

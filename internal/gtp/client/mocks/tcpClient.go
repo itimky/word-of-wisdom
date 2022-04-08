@@ -3,8 +3,9 @@
 package mocks
 
 import (
-	guide "github.com/itimky/word-of-wisom/api/guide"
 	mock "github.com/stretchr/testify/mock"
+
+	guide "github.com/itimky/word-of-wisom/api/guide"
 
 	server "github.com/itimky/word-of-wisom/api/server"
 )

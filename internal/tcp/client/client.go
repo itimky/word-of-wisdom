@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"net"
 
-	guideapi "github.com/itimky/word-of-wisom/api/guide"
-	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/sirupsen/logrus"
 	"github.com/tinylib/msgp/msgp"
+
+	guideapi "github.com/itimky/word-of-wisom/api/guide"
+	srvapi "github.com/itimky/word-of-wisom/api/server"
 )
 
 type Client struct {

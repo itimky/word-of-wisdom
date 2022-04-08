@@ -39,7 +39,6 @@ func main() {
 			GuideSecrets:         conf.GuideSecrets,
 		},
 		hashCalc,
-		quoteSvc,
 	)
 	if err = shieldSvc.Init(); err != nil {
 		logrus.WithError(err).Fatal("shield service init")
@@ -49,6 +48,7 @@ func main() {
 		fmt.Sprintf("%v:%v", conf.Host, conf.Port),
 		conf.Multicore,
 		shieldSvc,
+		quoteSvc,
 	)
 	if err = srv.Run(); err != nil {
 		logrus.WithError(err).Fatal("server run")

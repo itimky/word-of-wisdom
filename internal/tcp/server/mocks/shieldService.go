@@ -21,77 +21,40 @@ func (_m *ShieldService) EXPECT() *ShieldService_Expecter {
 	return &ShieldService_Expecter{mock: &_m.Mock}
 }
 
-// HandleInitial provides a mock function with given fields: clientIP
-func (_m *ShieldService) HandleInitial(clientIP string) shield.InitialResult {
-	ret := _m.Called(clientIP)
+// CheckPuzzle provides a mock function with given fields: clientIP, solution
+func (_m *ShieldService) CheckPuzzle(clientIP string, solution *shield.PuzzleSolution) shield.PuzzleCheckResult {
+	ret := _m.Called(clientIP, solution)
 
-	var r0 shield.InitialResult
-	if rf, ok := ret.Get(0).(func(string) shield.InitialResult); ok {
-		r0 = rf(clientIP)
+	var r0 shield.PuzzleCheckResult
+	if rf, ok := ret.Get(0).(func(string, *shield.PuzzleSolution) shield.PuzzleCheckResult); ok {
+		r0 = rf(clientIP, solution)
 	} else {
-		r0 = ret.Get(0).(shield.InitialResult)
+		r0 = ret.Get(0).(shield.PuzzleCheckResult)
 	}
 
 	return r0
 }
 
-// ShieldService_HandleInitial_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HandleInitial'
-type ShieldService_HandleInitial_Call struct {
+// ShieldService_CheckPuzzle_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckPuzzle'
+type ShieldService_CheckPuzzle_Call struct {
 	*mock.Call
 }
 
-// HandleInitial is a helper method to define mock.On call
+// CheckPuzzle is a helper method to define mock.On call
 //  - clientIP string
-func (_e *ShieldService_Expecter) HandleInitial(clientIP interface{}) *ShieldService_HandleInitial_Call {
-	return &ShieldService_HandleInitial_Call{Call: _e.mock.On("HandleInitial", clientIP)}
+//  - solution *shield.PuzzleSolution
+func (_e *ShieldService_Expecter) CheckPuzzle(clientIP interface{}, solution interface{}) *ShieldService_CheckPuzzle_Call {
+	return &ShieldService_CheckPuzzle_Call{Call: _e.mock.On("CheckPuzzle", clientIP, solution)}
 }
 
-func (_c *ShieldService_HandleInitial_Call) Run(run func(clientIP string)) *ShieldService_HandleInitial_Call {
+func (_c *ShieldService_CheckPuzzle_Call) Run(run func(clientIP string, solution *shield.PuzzleSolution)) *ShieldService_CheckPuzzle_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(string), args[1].(*shield.PuzzleSolution))
 	})
 	return _c
 }
 
-func (_c *ShieldService_HandleInitial_Call) Return(_a0 shield.InitialResult) *ShieldService_HandleInitial_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-// HandleTourComplete provides a mock function with given fields: clientIP, request
-func (_m *ShieldService) HandleTourComplete(clientIP string, request shield.TourCompleteRequest) shield.TourCompleteResult {
-	ret := _m.Called(clientIP, request)
-
-	var r0 shield.TourCompleteResult
-	if rf, ok := ret.Get(0).(func(string, shield.TourCompleteRequest) shield.TourCompleteResult); ok {
-		r0 = rf(clientIP, request)
-	} else {
-		r0 = ret.Get(0).(shield.TourCompleteResult)
-	}
-
-	return r0
-}
-
-// ShieldService_HandleTourComplete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HandleTourComplete'
-type ShieldService_HandleTourComplete_Call struct {
-	*mock.Call
-}
-
-// HandleTourComplete is a helper method to define mock.On call
-//  - clientIP string
-//  - request shield.TourCompleteRequest
-func (_e *ShieldService_Expecter) HandleTourComplete(clientIP interface{}, request interface{}) *ShieldService_HandleTourComplete_Call {
-	return &ShieldService_HandleTourComplete_Call{Call: _e.mock.On("HandleTourComplete", clientIP, request)}
-}
-
-func (_c *ShieldService_HandleTourComplete_Call) Run(run func(clientIP string, request shield.TourCompleteRequest)) *ShieldService_HandleTourComplete_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(shield.TourCompleteRequest))
-	})
-	return _c
-}
-
-func (_c *ShieldService_HandleTourComplete_Call) Return(_a0 shield.TourCompleteResult) *ShieldService_HandleTourComplete_Call {
+func (_c *ShieldService_CheckPuzzle_Call) Return(_a0 shield.PuzzleCheckResult) *ShieldService_CheckPuzzle_Call {
 	_c.Call.Return(_a0)
 	return _c
 }

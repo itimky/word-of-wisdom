@@ -4,17 +4,25 @@ import (
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
-type InitialResult struct {
+type CheckResultType int
+
+const (
+	Ok            CheckResultType = 0
+	Restricted    CheckResultType = 1
+	WrongSolution CheckResultType = 2
+)
+
+type Puzzle struct {
 	InitialHash gtp.Hash
 	TourLength  int
 }
 
-type TourCompleteRequest struct {
+type PuzzleSolution struct {
 	InitialHash gtp.Hash
 	LastHash    gtp.Hash
 }
 
-type TourCompleteResult struct {
-	Granted bool
-	Quote   string
+type PuzzleCheckResult struct {
+	Type   CheckResultType
+	Puzzle *Puzzle
 }

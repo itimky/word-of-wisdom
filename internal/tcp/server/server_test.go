@@ -14,39 +14,46 @@ import (
 
 type ServerSuite struct {
 	suite.Suite
-	shieldMock *mocks.ShieldService
-	srv        *Server
-	clientIP   string
+	shieldMock       *mocks.ShieldService
+	quoteServiceMock *mocks.QuoteService
+	srv              *Server
+	clientIP         string
 }
 
 func (s *ServerSuite) SetupSuite() {
-	// Init shieldMock in SetupTest
+	// Init shieldMock & quoteServiceMock in SetupTest
 	s.srv = &Server{}
 	s.clientIP = "127.0.0.1"
 }
 
 func (s *ServerSuite) SetupTest() {
 	s.shieldMock = &mocks.ShieldService{}
+	s.quoteServiceMock = &mocks.QuoteService{}
 	s.srv.shield = s.shieldMock
+	s.srv.quoteService = s.quoteServiceMock
 }
 
-func (s *ServerSuite) TestInitialRequest() {
-	request := srvapi.RequestMsg{Type: srvapi.Initial}
+func (s *ServerSuite) TestServer_handleRequest__Restricted() {
+	request := srvapi.RequestMsg{Type: srvapi.Quote}
 
 	hash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	tourLength := 7
-	shieldResult := shield.InitialResult{
-		InitialHash: hash,
-		TourLength:  tourLength,
+	checkResult := shield.PuzzleCheckResult{
+		Type: shield.Restricted,
+		Puzzle: &shield.Puzzle{
+			InitialHash: hash,
+			TourLength:  tourLength,
+		},
 	}
-	payload := srvapi.ServiceRestrictedPayload{
+
+	payload := srvapi.PuzzleResponse{
 		InitialHash: api.Hash(hash),
 		TourLength:  byte(tourLength),
 	}
 	rawPayload, err := payload.MarshalMsg(nil)
 	s.NoError(err)
 
-	s.shieldMock.EXPECT().HandleInitial(s.clientIP).Return(shieldResult)
+	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*shield.PuzzleSolution)(nil)).Return(checkResult)
 
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
@@ -54,25 +61,25 @@ func (s *ServerSuite) TestInitialRequest() {
 	s.Equal(msgp.Raw(rawPayload), response.Payload)
 }
 
-func (s *ServerSuite) TestWrongPuzzle() {
+func (s *ServerSuite) TestWrongSolution() {
 	initialHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	latHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E5")
-	tourCompleteRequest := shield.TourCompleteRequest{
+	puzzleSolution := shield.PuzzleSolution{
 		InitialHash: initialHash,
 		LastHash:    latHash,
 	}
-	tourCompleteResult := shield.TourCompleteResult{
-		Granted: false,
+	checkResult := shield.PuzzleCheckResult{
+		Type: shield.WrongSolution,
 	}
-	payload := srvapi.TourCompletePayload{
+	solutionPayload := srvapi.PuzzleSolution{
 		InitialHash: api.Hash(initialHash),
 		LastHash:    api.Hash(latHash),
 	}
-	rawPayload, err := payload.MarshalMsg(nil)
+	rawPayload, err := solutionPayload.MarshalMsg(nil)
 	s.NoError(err)
-	request := srvapi.RequestMsg{Type: srvapi.TourComplete, Payload: rawPayload}
+	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: rawPayload}
 
-	s.shieldMock.EXPECT().HandleTourComplete(s.clientIP, tourCompleteRequest).Return(tourCompleteResult)
+	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, &puzzleSolution).Return(checkResult)
 
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
@@ -84,25 +91,25 @@ func (s *ServerSuite) TestGranted() {
 	initialHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E9")
 	latHash := testutils.HexHash("820888B1A040503A82AFA97EB0AE59E8214866C2D74F3DBC705A002FB17C86E5")
 	quote := "Some quote"
-	tourCompleteRequest := shield.TourCompleteRequest{
+	puzzleSolution := &shield.PuzzleSolution{
 		InitialHash: initialHash,
 		LastHash:    latHash,
 	}
-	tourCompleteResult := shield.TourCompleteResult{
-		Granted: true,
-		Quote:   quote,
+	checkResult := shield.PuzzleCheckResult{
+		Type: shield.Ok,
 	}
-	payload := srvapi.TourCompletePayload{
+	payload := srvapi.PuzzleSolution{
 		InitialHash: api.Hash(initialHash),
 		LastHash:    api.Hash(latHash),
 	}
 	rawPayload, err := payload.MarshalMsg(nil)
 	s.NoError(err)
-	request := srvapi.RequestMsg{Type: srvapi.TourComplete, Payload: rawPayload}
+	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: rawPayload}
 
-	s.shieldMock.EXPECT().HandleTourComplete(s.clientIP, tourCompleteRequest).Return(tourCompleteResult)
+	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, puzzleSolution).Return(checkResult)
+	s.quoteServiceMock.EXPECT().Get().Return(quote)
 
-	responsePayload := srvapi.ServiceGrantedPayload{Quote: quote}
+	responsePayload := srvapi.QuoteResponse{Quote: quote}
 	rawResponsePayload, err := responsePayload.MarshalMsg(nil)
 	s.NoError(err)
 
@@ -114,6 +121,10 @@ func (s *ServerSuite) TestGranted() {
 
 func (s *ServerSuite) TestUnsupported() {
 	request := srvapi.RequestMsg{Type: srvapi.RequestType(10)}
+	checkResult := shield.PuzzleCheckResult{
+		Type: shield.Ok,
+	}
+	s.shieldMock.EXPECT().CheckPuzzle(s.clientIP, (*shield.PuzzleSolution)(nil)).Return(checkResult)
 	response, err := s.srv.handleRequest(s.clientIP, request)
 	s.NoError(err)
 	s.Equal(srvapi.Unsupported, response.Type)

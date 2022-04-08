@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net"
 
-	guidecontracts "github.com/itimky/word-of-wisom/api/guide"
-	srvcontracts "github.com/itimky/word-of-wisom/api/server"
+	guideapi "github.com/itimky/word-of-wisom/api/guide"
+	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 
 	"github.com/sirupsen/logrus"
@@ -35,8 +35,8 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 		}
 
 		switch response.Type {
-		case srvcontracts.Granted:
-			serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
+		case srvapi.Granted:
+			serviceGrantedMsg := srvapi.QuoteResponse{}
 			if _, err = serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
 				return "", fmt.Errorf("unmarshal service granted response: %w", err)
 			}
@@ -45,8 +45,8 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 			logrus.Debugf("%v+", serviceGrantedMsg)
 
 			return serviceGrantedMsg.Quote, nil
-		case srvcontracts.Restricted:
-			serviceRestrictedMsg := srvcontracts.ServiceRestrictedPayload{}
+		case srvapi.Restricted:
+			serviceRestrictedMsg := srvapi.PuzzleResponse{}
 			if _, err = serviceRestrictedMsg.UnmarshalMsg(response.Payload); err != nil {
 				return "", fmt.Errorf("unmarshal service restricted response: %w", err)
 			}
@@ -71,10 +71,10 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 			}
 
 			return quote, nil
-		case srvcontracts.WrongPuzzle:
+		case srvapi.WrongPuzzle:
 			// TODO: add WrongPuzzle handling
 			return "", nil
-		case srvcontracts.Unsupported:
+		case srvapi.Unsupported:
 			return "", fmt.Errorf("unsupported request: %w", err)
 		default:
 			return "", fmt.Errorf("unknown response type: %v", response.Type)
@@ -84,9 +84,9 @@ func (c *Client) RequestQuote(retryCount int) (string, error) {
 	return "", fmt.Errorf("max retries")
 }
 
-func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
-	request := srvcontracts.RequestMsg{Type: srvcontracts.Initial}
-	response := srvcontracts.ResponseMsg{}
+func (c *Client) initialRequest() (srvapi.ResponseMsg, error) {
+	request := srvapi.RequestMsg{Type: srvapi.Quote}
+	response := srvapi.ResponseMsg{}
 
 	conn, err := net.Dial("tcp", c.server)
 	if err != nil {
@@ -113,13 +113,13 @@ func (c *Client) initialRequest() (srvcontracts.ResponseMsg, error) {
 	return response, nil
 }
 
-func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRestrictedPayload) ([32]byte, error) {
+func (c *Client) guidedTourRequest(serviceRestrictedMsg srvapi.PuzzleResponse) ([32]byte, error) {
 	prevHash := serviceRestrictedMsg.InitialHash
 
 	for i := 1; i < int(serviceRestrictedMsg.TourLength)+1; i++ {
 		logrus.Debugf("tour number: %v", i)
 
-		request := guidecontracts.RequestMsg{
+		request := guideapi.RequestMsg{
 			PreviousHash: prevHash,
 			TourNumber:   byte(i),
 			TourLength:   serviceRestrictedMsg.TourLength,
@@ -144,7 +144,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 
 		logrus.Debugf("Guide request sent: %v", request)
 
-		response := guidecontracts.ResponseMsg{}
+		response := guideapi.ResponseMsg{}
 		if err := response.DecodeMsg(msgp.NewReader(conn)); err != nil {
 			return prevHash, fmt.Errorf("decode guide response: %w", err)
 		}
@@ -156,7 +156,7 @@ func (c *Client) guidedTourRequest(serviceRestrictedMsg srvcontracts.ServiceRest
 }
 
 func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, error) {
-	tourCompletePayload := srvcontracts.TourCompletePayload{
+	tourCompletePayload := srvapi.PuzzleSolution{
 		InitialHash: initialHash, LastHash: lastHash}
 
 	requestPayload, err := tourCompletePayload.MarshalMsg(nil)
@@ -165,7 +165,7 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 		return "", fmt.Errorf("marshal tour complete payload: %w", err)
 	}
 
-	request := srvcontracts.RequestMsg{Type: srvcontracts.TourComplete, Payload: requestPayload}
+	request := srvapi.RequestMsg{Type: srvapi.Quote, PuzzleSolution: requestPayload}
 
 	conn, err := net.Dial("tcp", c.server)
 	if err != nil {
@@ -185,25 +185,25 @@ func (c *Client) tourCompleteRequest(initialHash, lastHash [32]byte) (string, er
 
 	logrus.Debugf("Server request sent: %v", request)
 
-	response := srvcontracts.ResponseMsg{}
+	response := srvapi.ResponseMsg{}
 	if err := response.DecodeMsg(msgp.NewReader(conn)); err != nil {
 		return "", fmt.Errorf("decode server response: %w", err)
 	}
 
 	switch response.Type {
-	case srvcontracts.Granted:
-		serviceGrantedMsg := srvcontracts.ServiceGrantedPayload{}
+	case srvapi.Granted:
+		serviceGrantedMsg := srvapi.QuoteResponse{}
 		if _, err := serviceGrantedMsg.UnmarshalMsg(response.Payload); err != nil {
 			return "", fmt.Errorf("unmarshal service granted response: %w", err)
 		}
 
 		return serviceGrantedMsg.Quote, nil
-	case srvcontracts.Restricted:
+	case srvapi.Restricted:
 		return "", errServiceRestricted
-	case srvcontracts.WrongPuzzle:
+	case srvapi.WrongPuzzle:
 		// TODO: add WrongPuzzle handling
 		return "", nil
-	case srvcontracts.Unsupported:
+	case srvapi.Unsupported:
 		return "", fmt.Errorf("unsupported request")
 	default:
 		return "", fmt.Errorf("unknown response type: %v", response.Type)

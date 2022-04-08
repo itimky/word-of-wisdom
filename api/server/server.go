@@ -10,16 +10,15 @@ import (
 type RequestType byte
 
 const (
-	Initial      RequestType = 0
-	TourComplete RequestType = 1
+	Quote RequestType = 0
 )
 
 type RequestMsg struct {
-	Type    RequestType `msg:"type"`
-	Payload msgp.Raw    `msg:"payload"` // nil, TourCompletePayload
+	Type           RequestType `msg:"type"`
+	PuzzleSolution msgp.Raw    `msg:"puzzle_solution"` // nil, PuzzleSolution
 }
 
-type TourCompletePayload struct {
+type PuzzleSolution struct {
 	InitialHash api.Hash `msg:"initial_hash,extension"`
 	LastHash    api.Hash `msg:"last_hash,extension"`
 }
@@ -37,14 +36,14 @@ const (
 
 type ResponseMsg struct {
 	Type    ResponseType `msg:"type"`
-	Payload msgp.Raw     `msg:"payload"` // nil, ServiceRestrictedPayload, ServiceGrantedPayload
+	Payload msgp.Raw     `msg:"payload"` // nil, PuzzleResponse, QuoteResponse
 }
 
-type ServiceRestrictedPayload struct {
+type PuzzleResponse struct {
 	InitialHash api.Hash `msg:"initial_hash,extension"`
 	TourLength  byte     `msg:"tour_length"`
 }
 
-type ServiceGrantedPayload struct {
+type QuoteResponse struct {
 	Quote string `msg:"quote"`
 }

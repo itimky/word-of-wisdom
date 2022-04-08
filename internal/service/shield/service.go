@@ -8,21 +8,18 @@ import (
 )
 
 type Service struct {
-	cfg          Config
-	secret       string
-	hashCalc     hashCalc
-	quoteService quoteService
+	cfg      Config
+	secret   string
+	hashCalc hashCalc
 }
 
 func NewService(
 	cfg Config,
 	hashCalc hashCalc,
-	quoteService quoteService,
 ) *Service {
 	return &Service{
-		cfg:          cfg,
-		hashCalc:     hashCalc,
-		quoteService: quoteService,
+		cfg:      cfg,
+		hashCalc: hashCalc,
 	}
 }
 
@@ -53,19 +50,19 @@ func (s *Service) updateSecret() error {
 	return nil
 }
 
-func (s *Service) HandleInitial(clientIP string) InitialResult {
-	initialHash := s.hashCalc.CalcInitialHash(clientIP, s.cfg.TourLength, s.secret)
-	return InitialResult{InitialHash: initialHash, TourLength: s.cfg.TourLength}
-}
-
-func (s *Service) HandleTourComplete(clientIP string, request TourCompleteRequest) TourCompleteResult {
-	var response TourCompleteResult
-	if s.hashCalc.VerifyHash(request.InitialHash, request.LastHash, s.cfg.TourLength, clientIP, s.secret, s.cfg.GuideSecrets) {
-		response.Granted = true
-		response.Quote = s.quoteService.Get()
+func (s *Service) CheckPuzzle(clientIP string, solution *PuzzleSolution) PuzzleCheckResult {
+	var result PuzzleCheckResult
+	if solution == nil {
+		result.Type = Restricted
+		initialHash := s.hashCalc.CalcInitialHash(clientIP, s.cfg.TourLength, s.secret)
+		result.Puzzle = &Puzzle{InitialHash: initialHash, TourLength: s.cfg.TourLength}
 	} else {
-		response.Granted = false
+		if s.hashCalc.VerifyHash(solution.InitialHash, solution.LastHash, s.cfg.TourLength, clientIP, s.secret, s.cfg.GuideSecrets) {
+			result.Type = Ok
+		} else {
+			result.Type = WrongSolution
+		}
 	}
 
-	return response
+	return result
 }

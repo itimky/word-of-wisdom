@@ -3,56 +3,65 @@ package server
 import (
 	"fmt"
 
+	"github.com/tinylib/msgp/msgp"
+
 	"github.com/itimky/word-of-wisom/api"
 	srvapi "github.com/itimky/word-of-wisom/api/server"
 	"github.com/itimky/word-of-wisom/internal/service/shield"
 	"github.com/itimky/word-of-wisom/pkg/gtp"
 )
 
-func convertInitialResultToResponseMsg(result shield.InitialResult) (srvapi.ResponseMsg, error) {
-	var responseMsg srvapi.ResponseMsg
-	serviceRestrictedPayload := srvapi.ServiceRestrictedPayload{
-		InitialHash: api.Hash(result.InitialHash),
-		TourLength:  byte(result.TourLength),
+func convertPuzzleSolution(solution msgp.Raw) (*shield.PuzzleSolution, error) {
+	if solution == nil {
+		return nil, nil
 	}
 
-	responsePayload, err := serviceRestrictedPayload.MarshalMsg(nil)
-	if err != nil {
-		return responseMsg, fmt.Errorf("marshal restricted response payload: %w", err)
+	var requestPayload srvapi.PuzzleSolution
+	if _, err := requestPayload.UnmarshalMsg(solution); err != nil {
+		return nil, fmt.Errorf("unmarshal tour complete request payload: %w", err)
 	}
 
-	responseMsg.Type = srvapi.Restricted
-	responseMsg.Payload = responsePayload
-
-	return responseMsg, nil
+	return &shield.PuzzleSolution{
+		InitialHash: gtp.Hash(requestPayload.InitialHash),
+		LastHash:    gtp.Hash(requestPayload.LastHash),
+	}, nil
 }
 
-func convertRequestMsgToTourCompleteRequest(msg srvapi.RequestMsg) (shield.TourCompleteRequest, error) {
-	var tourCompleteRequest shield.TourCompleteRequest
-	var requestPayload srvapi.TourCompletePayload
-	if _, err := requestPayload.UnmarshalMsg(msg.Payload); err != nil {
-		return tourCompleteRequest, fmt.Errorf("unmarshal tour complete request payload: %w", err)
-	}
-
-	tourCompleteRequest.InitialHash = gtp.Hash(requestPayload.InitialHash)
-	tourCompleteRequest.LastHash = gtp.Hash(requestPayload.LastHash)
-
-	return tourCompleteRequest, nil
-}
-
-func convertTourCompleteResultToResponseMsg(result shield.TourCompleteResult) (srvapi.ResponseMsg, error) {
-	var responseMsg srvapi.ResponseMsg
-	if result.Granted {
-		responseMsg.Type = srvapi.Granted
-		payload := srvapi.ServiceGrantedPayload{Quote: result.Quote}
-		responsePayload, err := payload.MarshalMsg(nil)
-		if err != nil {
-			return responseMsg, fmt.Errorf("marshal service granted payload: %w", err)
+func newRestrictedResponse(checkResult shield.PuzzleCheckResult) (*srvapi.ResponseMsg, error) {
+	var responseType srvapi.ResponseType
+	var payload msgp.Raw
+	switch checkResult.Type {
+	case shield.Restricted:
+		responseType = srvapi.Restricted
+		puzzleResponse := &srvapi.PuzzleResponse{
+			InitialHash: api.Hash(checkResult.Puzzle.InitialHash),
+			TourLength:  byte(checkResult.Puzzle.TourLength),
 		}
-		responseMsg.Payload = responsePayload
-	} else {
-		responseMsg.Type = srvapi.WrongPuzzle
+		var err error
+		payload, err = puzzleResponse.MarshalMsg(nil)
+		if err != nil {
+			return nil, fmt.Errorf("marshal puzzle payload: %w", err)
+		}
+	case shield.WrongSolution:
+		responseType = srvapi.WrongPuzzle
+	case shield.Ok:
+		return nil, fmt.Errorf("unexpected result type: %v", checkResult.Type)
 	}
 
-	return responseMsg, nil
+	return &srvapi.ResponseMsg{
+		Type:    responseType,
+		Payload: payload,
+	}, nil
+}
+
+func newQuoteResponse(quote string) (*srvapi.ResponseMsg, error) {
+	payload := srvapi.QuoteResponse{Quote: quote}
+	responsePayload, err := payload.MarshalMsg(nil)
+	if err != nil {
+		return nil, fmt.Errorf("marshal service granted payload: %w", err)
+	}
+	return &srvapi.ResponseMsg{
+		Type:    srvapi.Granted,
+		Payload: responsePayload,
+	}, nil
 }

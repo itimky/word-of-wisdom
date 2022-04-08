@@ -18,14 +18,16 @@ type Server struct {
 	addr      string
 	multicore bool
 
-	shield shieldService
+	shield       shieldService
+	quoteService quoteService
 }
 
-func NewServer(addr string, multicore bool, serviceSvc shieldService) *Server {
+func NewServer(addr string, multicore bool, serviceSvc shieldService, quoteSvc quoteService) *Server {
 	return &Server{
-		addr:      addr,
-		multicore: multicore,
-		shield:    serviceSvc,
+		addr:         addr,
+		multicore:    multicore,
+		shield:       serviceSvc,
+		quoteService: quoteSvc,
 	}
 }
 
@@ -57,7 +59,9 @@ func (s *Server) handleConnection(conn gnet.Conn) error {
 		return fmt.Errorf("decode message: %w", err)
 	}
 
-	responseMsg, err := s.handleRequest(tcp.GetClientIP(conn), requestMsg)
+	clientIP := tcp.GetClientIP(conn)
+
+	responseMsg, err := s.handleRequest(clientIP, requestMsg)
 	if err != nil {
 		return fmt.Errorf("handle request: %w", err)
 	}
@@ -75,30 +79,44 @@ func (s *Server) handleConnection(conn gnet.Conn) error {
 	return nil
 }
 
-func (s *Server) handleRequest(clientIP string, requestMsg srvapi.RequestMsg) (srvapi.ResponseMsg, error) {
-	var responseMsg srvapi.ResponseMsg
-	var err error
-	switch requestMsg.Type {
-	case srvapi.Initial:
-		result := s.shield.HandleInitial(clientIP)
-		responseMsg, err = convertInitialResultToResponseMsg(result)
-		if err != nil {
-			return responseMsg, fmt.Errorf("convert initial result")
-		}
-	case srvapi.TourComplete:
-		var request shield.TourCompleteRequest
-		request, err = convertRequestMsgToTourCompleteRequest(requestMsg)
-		if err != nil {
-			return responseMsg, fmt.Errorf("convert tour complete request: %w", err)
-		}
-		result := s.shield.HandleTourComplete(clientIP, request)
-		responseMsg, err = convertTourCompleteResultToResponseMsg(result)
-		if err != nil {
-			return responseMsg, fmt.Errorf("convert tour complete result")
-		}
-	default:
-		responseMsg.Type = srvapi.Unsupported
+func (s *Server) handleRequest(clientIP string, requestMsg srvapi.RequestMsg) (*srvapi.ResponseMsg, error) {
+	restrictedResponse, err := s.checkPuzzle(clientIP, requestMsg)
+	if err != nil {
+		return nil, fmt.Errorf("check puzzle: %w", err)
+	}
+	if restrictedResponse != nil {
+		return restrictedResponse, nil
 	}
 
-	return responseMsg, nil
+	switch requestMsg.Type {
+	case srvapi.Quote:
+		quote := s.quoteService.Get()
+		responseMsg, err := newQuoteResponse(quote)
+		if err != nil {
+			return responseMsg, fmt.Errorf("new quote response")
+		}
+		return responseMsg, nil
+	default:
+		return &srvapi.ResponseMsg{
+			Type: srvapi.Unsupported,
+		}, nil
+	}
+}
+
+func (s *Server) checkPuzzle(clientIP string, requestMsg srvapi.RequestMsg) (*srvapi.ResponseMsg, error) {
+	puzzleSolution, err := convertPuzzleSolution(requestMsg.PuzzleSolution)
+	if err != nil {
+		return nil, fmt.Errorf("convert puzzle solution: %w", err)
+	}
+
+	checkResult := s.shield.CheckPuzzle(clientIP, puzzleSolution)
+	if checkResult.Type != shield.Ok {
+		restrictedResponse, err := newRestrictedResponse(checkResult)
+		if err != nil {
+			return nil, fmt.Errorf("new restricted response")
+		}
+		return restrictedResponse, nil
+	}
+
+	return nil, nil
 }

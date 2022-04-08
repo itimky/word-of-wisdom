@@ -90,7 +90,7 @@ func (g *Guide) handleConnection(conn gnet.Conn) error {
 		return fmt.Errorf("marshal message: %w", err)
 	}
 
-	_, err = conn.Write(data)
+	err = conn.AsyncWrite(data, nil)
 	if err != nil {
 		return fmt.Errorf("write data: %w", err)
 	}

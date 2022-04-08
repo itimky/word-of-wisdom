@@ -93,9 +93,7 @@ func (s *Server) handleConnection(conn gnet.Conn) error {
 		return fmt.Errorf("marshal message: %w", err)
 	}
 
-	err = conn.AsyncWrite(data, func(c gnet.Conn) error {
-		return nil
-	})
+	err = conn.AsyncWrite(data, nil)
 	if err != nil {
 		return fmt.Errorf("write data: %w", err)
 	}
